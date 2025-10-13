@@ -24,28 +24,12 @@ function calculateEnergia() {
   const total = daily * diffDays;
 
   resultField.value = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-  info.textContent = `Diferença de ${diffDays.toFixed(0)} dia(s) × R$ ${daily.toFixed(2)} por dia.`;
+  info.textContent = `Previsão referente a ${diffDays.toFixed(0)} dia(s) de energia (Período ${formatDateBR(
+    ultimo
+  )} à ${formatDateBR(delivery)}).`;
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const yesOption = document.getElementById("yesOption");
-  const noOption = document.getElementById("noOption");
-  const dateInputs = document.getElementById("dateInputs");
-
-  function toggleDateInputs() {
-    if (yesOption.checked) {
-      dateInputs.style.display = "block";
-      dateInputs.classList.add("animate__animated", "animate__fadeIn");
-    } else {
-      dateInputs.style.display = "none";
-    }
-  }
-
-  yesOption.addEventListener("change", toggleDateInputs);
-  noOption.addEventListener("change", toggleDateInputs);
-});
-
-// Always format date as dd/mm/yyyy for display
+// Format date
 function formatDateBR(dateStr) {
   if (!dateStr) return "";
   const d = new Date(dateStr);
@@ -56,7 +40,73 @@ function formatDateBR(dateStr) {
   return `${dd}/${mm}/${yyyy}`;
 }
 
-// ✅ New function: Enable button only when fields are filled
+// =============== ADICIONAR RESULTADO ===============
+function setupAddResultEnergia() {
+  const resultBtn = document.getElementById("energia-add-result");
+  const list = document.getElementById("energia-list");
+  const energiaTotal = document.getElementById("energia-total");
+  const energiaInfo = document.getElementById("energia-info");
+  const divider = document.getElementById("energia-divider");
+  const previsaoContainer = document.getElementById("energia-previsao-container");
+
+  if (!resultBtn || !energiaTotal || !energiaInfo || !list) return;
+
+  resultBtn.addEventListener("click", () => {
+    const valor = energiaTotal.value.replace(/[^\d,.-]/g, "").replace(",", ".");
+    const info = energiaInfo.textContent.trim();
+
+    if (!valor || isNaN(parseFloat(valor))) {
+      alert("Nenhum resultado de energia para adicionar.");
+      return;
+    }
+
+    divider.style.display = "block";
+
+    previsaoContainer.innerHTML = `
+      <p class="text-muted mb-1">- ${info}</p>
+      <p class="fw-bold">${parseFloat(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</p>
+    `;
+
+    calculateTotalEnergia();
+  });
+}
+
+// =============== CALCULAR SOMA TOTAL ===============
+function calculateTotalEnergia() {
+  const list = document.getElementById("energia-list");
+  const previsaoContainer = document.getElementById("energia-previsao-container");
+  const totalDivider = document.getElementById("energia-total-divider");
+  const somaContainer = document.getElementById("energia-soma-container");
+
+  let soma = 0;
+
+  // Somar todos os itens da lista
+  list.querySelectorAll("li span").forEach(span => {
+    const match = span.textContent.match(/R\$\s*([\d.,]+)/);
+    if (match) {
+      const val = parseFloat(match[1].replace(/\./g, "").replace(",", "."));
+      soma += val;
+    }
+  });
+
+  // Somar previsão se existir
+  const previsaoText = previsaoContainer.textContent;
+  const previsaoMatch = previsaoText.match(/R\$\s*([\d.,]+)/);
+  if (previsaoMatch) {
+    const previsaoVal = parseFloat(previsaoMatch[1].replace(/\./g, "").replace(",", "."));
+    soma += previsaoVal;
+  }
+
+  if (soma > 0) {
+    totalDivider.style.display = "block";
+    somaContainer.textContent = `Soma total: ${soma.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`;
+  } else {
+    totalDivider.style.display = "none";
+    somaContainer.textContent = "";
+  }
+}
+
+// =============== LISTA DE ITENS =================
 function setupAddLine(section) {
   const addBtn = document.getElementById(`${section}-add-btn`);
   const descInput = document.getElementById(`${section}-desc`);
@@ -66,17 +116,12 @@ function setupAddLine(section) {
 
   if (!addBtn || !descInput || !dateInput || !valueInput || !list) return;
 
-  addBtn.disabled = true; // button starts disabled
+  addBtn.disabled = true;
   let count = 1;
 
-  // 🧠 Enable button only when all fields are filled
   [descInput, dateInput, valueInput].forEach(input => {
     input.addEventListener("input", () => {
-      if (descInput.value.trim() && dateInput.value && valueInput.value.trim()) {
-        addBtn.disabled = false;
-      } else {
-        addBtn.disabled = true;
-      }
+      addBtn.disabled = !(descInput.value.trim() && dateInput.value && valueInput.value.trim());
     });
   });
 
@@ -90,7 +135,7 @@ function setupAddLine(section) {
 
     const leftText = document.createElement("span");
     const brl = val.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-    leftText.textContent = `${count}. ${desc} ${formatDateBR(date)}. ${brl}`;
+    leftText.textContent = `${count}. Vencimento ${formatDateBR(date)}. ${brl}`;
 
     const del = document.createElement("button");
     del.className = "btn btn-sm btn-outline-danger ms-3";
@@ -98,6 +143,7 @@ function setupAddLine(section) {
     del.addEventListener("click", () => {
       li.remove();
       renumber();
+      calculateTotalEnergia();
     });
 
     li.appendChild(leftText);
@@ -108,7 +154,9 @@ function setupAddLine(section) {
     descInput.value = "";
     dateInput.value = "";
     valueInput.value = "";
-    addBtn.disabled = true; // disable button again after adding
+    addBtn.disabled = true;
+
+    calculateTotalEnergia();
 
     function renumber() {
       const items = list.querySelectorAll("li span");
@@ -121,7 +169,8 @@ function setupAddLine(section) {
   });
 }
 
-// Init for Energia, Água, Condomínio
+// Init for Energia
 document.addEventListener("DOMContentLoaded", () => {
   ["energia"].forEach(setupAddLine);
+  setupAddResultEnergia();
 });
