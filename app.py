@@ -36,6 +36,15 @@ def dashboard():
     return render_template("dashboard.html", entries=entries, total=total)
 
 
+@app.route("/preview")
+def preview():
+    return render_template("preview.html")
+
+@app.route("/dashboard")
+def dashboard_view():  # 👈 different name
+    return render_template("dashboard.html")
+
+
 @app.route("/add-entry", methods=["POST"])
 def add_entry():
     global next_id

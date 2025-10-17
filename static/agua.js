@@ -1,6 +1,5 @@
 // ===== Água =====
 function calculateAgua() {
-  updateSharedDates();
   const ultimo = document.getElementById("agua-ultimo")?.value;
   const delivery = document.getElementById("delivery-date")?.value;
   const valor = parseFloat(document.getElementById("agua-valor")?.value || 0);
@@ -15,7 +14,7 @@ function calculateAgua() {
 
   if (ultimo === delivery) {
     resultField.value = "R$ 0,00";
-    info.textContent = "Sem diferença de dias entre a entrega e o aviso.";
+    info.textContent = "Sem diferença de dias.";
     return;
   }
 
@@ -24,10 +23,12 @@ function calculateAgua() {
   const total = daily * diffDays;
 
   resultField.value = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-  info.textContent = `Diferença de ${diffDays.toFixed(0)} dia(s) × R$ ${daily.toFixed(2)} por dia.`;
+  info.textContent = `Previsão referente a ${diffDays.toFixed(0)} dia(s) de água (Período ${formatDateBR(
+    ultimo
+  )} à ${formatDateBR(delivery)}).`;
 }
 
-// Always format date as dd/mm/yyyy for display
+// Helper format
 function formatDateBR(dateStr) {
   if (!dateStr) return "";
   const d = new Date(dateStr);
@@ -38,59 +39,49 @@ function formatDateBR(dateStr) {
   return `${dd}/${mm}/${yyyy}`;
 }
 
-// ✅ New function: Enable button only when fields are filled
-function setupAddLine(section) {
-  const addBtn = document.getElementById(`${section}-add-btn`);
-  const descInput = document.getElementById(`${section}-desc`);
-  const dateInput = document.getElementById(`${section}-date`);
-  const valueInput = document.getElementById(`${section}-value`);
-  const list = document.getElementById(`${section}-list`);
+// ===== Manual Items =====
+function setupAddLineAgua() {
+  const addBtn = document.getElementById("agua-add-btn");
+  const descInput = document.getElementById("agua-desc");
+  const dateInput = document.getElementById("agua-date");
+  const valueInput = document.getElementById("agua-value");
+  const list = document.getElementById("agua-list");
 
   if (!addBtn || !descInput || !dateInput || !valueInput || !list) return;
 
-  addBtn.disabled = true; // button starts disabled
+  addBtn.disabled = true;
   let count = 1;
 
-  // 🧠 Enable button only when all fields are filled
   [descInput, dateInput, valueInput].forEach(input => {
     input.addEventListener("input", () => {
-      if (descInput.value.trim() && dateInput.value && valueInput.value.trim()) {
-        addBtn.disabled = false;
-      } else {
-        addBtn.disabled = true;
-      }
+      addBtn.disabled = !(descInput.value.trim() && dateInput.value && valueInput.value.trim());
     });
   });
 
   addBtn.addEventListener("click", () => {
-    const desc = descInput.value.trim();
     const date = dateInput.value;
     const val = Number(valueInput.value.replace(",", "."));
 
     const li = document.createElement("li");
     li.className = "list-group-item d-flex justify-content-between align-items-center";
+    li.innerHTML = `
+      <span>${count}. Vencimento ${formatDateBR(date)}. ${val.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</span>
+      <button class="btn btn-sm btn-outline-danger ms-3">❌</button>
+    `;
 
-    const leftText = document.createElement("span");
-    const brl = val.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-    leftText.textContent = `${count}. ${desc} ${formatDateBR(date)}. ${brl}`;
-
-    const del = document.createElement("button");
-    del.className = "btn btn-sm btn-outline-danger ms-3";
-    del.textContent = "❌";
-    del.addEventListener("click", () => {
+    li.querySelector("button").addEventListener("click", () => {
       li.remove();
       renumber();
+      calculateTotalAgua();
     });
 
-    li.appendChild(leftText);
-    li.appendChild(del);
     list.appendChild(li);
-
     count++;
     descInput.value = "";
     dateInput.value = "";
     valueInput.value = "";
-    addBtn.disabled = true; // disable button again after adding
+    addBtn.disabled = true;
+    calculateTotalAgua();
 
     function renumber() {
       const items = list.querySelectorAll("li span");
@@ -103,7 +94,60 @@ function setupAddLine(section) {
   });
 }
 
-// Init for Energia, Água, Condomínio
+// ===== Adicionar Resultado =====
+function setupAddResultAgua() {
+  const resultBtn = document.getElementById("agua-add-result");
+  const aguaTotal = document.getElementById("agua-total");
+  const aguaInfo = document.getElementById("agua-info");
+  const divider = document.getElementById("agua-divider");
+  const previsaoContainer = document.getElementById("agua-previsao-container");
+
+  if (!resultBtn) return;
+
+  resultBtn.addEventListener("click", () => {
+    const valor = aguaTotal.value.replace(/[^\d,.-]/g, "").replace(",", ".");
+    const info = aguaInfo.textContent.trim();
+    if (!valor || isNaN(parseFloat(valor))) {
+      alert("Nenhum resultado de água para adicionar.");
+      return;
+    }
+
+    divider.style.display = "block";
+    previsaoContainer.innerHTML = `
+      <p class="text-muted mb-1">- ${info}</p>
+      <p class="fw-bold">${parseFloat(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</p>
+    `;
+    calculateTotalAgua();
+  });
+}
+
+// ===== Soma Total =====
+function calculateTotalAgua() {
+  const list = document.getElementById("agua-list");
+  const previsaoContainer = document.getElementById("agua-previsao-container");
+  const totalDivider = document.getElementById("agua-total-divider");
+  const somaContainer = document.getElementById("agua-soma-container");
+
+  let soma = 0;
+
+  list.querySelectorAll("li span").forEach(span => {
+    const match = span.textContent.match(/R\$\s*([\d.,]+)/);
+    if (match) soma += parseFloat(match[1].replace(/\./g, "").replace(",", "."));
+  });
+
+  const previsaoMatch = previsaoContainer.textContent.match(/R\$\s*([\d.,]+)/);
+  if (previsaoMatch) soma += parseFloat(previsaoMatch[1].replace(/\./g, "").replace(",", "."));
+
+  if (soma > 0) {
+    totalDivider.style.display = "block";
+    somaContainer.textContent = `Soma total: ${soma.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`;
+  } else {
+    totalDivider.style.display = "none";
+    somaContainer.textContent = "";
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-  ["agua"].forEach(setupAddLine);
+  setupAddLineAgua();
+  setupAddResultAgua();
 });

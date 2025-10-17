@@ -2,6 +2,23 @@
 // IPTU Section
 // ======================
 
+document.addEventListener("DOMContentLoaded", () => {
+  const yesDueDate = document.getElementById("yesDueDate");
+  const noDueDate = document.getElementById("noDueDate");
+  const dueDateInput = document.getElementById("iptu-value");
+
+  function toggleDueDate() {
+    if (yesDueDate.checked) {
+      dueDateInput.style.display = "inline-block";
+    } else {
+      dueDateInput.style.display = "none";
+    }
+  }
+
+  yesDueDate.addEventListener("change", toggleDueDate);
+  noDueDate.addEventListener("change", toggleDueDate);
+});
+
 // ✅ Format BRL
 function formatCurrencyBRL(value) {
   if (isNaN(value) || value === null) return "";

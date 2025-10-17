@@ -1,18 +1,19 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const yesDueDate = document.getElementById("yesDueDate");
-  const noDueDate = document.getElementById("noDueDate");
-  const dueDateInput = document.getElementById("iptu-value");
+  const yesOption = document.getElementById("yesOption");
+  const noOption = document.getElementById("noOption");
+  const dateInputs = document.getElementById("dateInputs");
 
-  function toggleDueDate() {
-    if (yesDueDate.checked) {
-      dueDateInput.style.display = "inline-block";
+  function toggleDateInputs() {
+    if (yesOption.checked) {
+      dateInputs.style.display = "block";
+      dateInputs.classList.add("animate__animated", "animate__fadeIn");
     } else {
-      dueDateInput.style.display = "none";
+      dateInputs.style.display = "none";
     }
   }
 
-  yesDueDate.addEventListener("change", toggleDueDate);
-  noDueDate.addEventListener("change", toggleDueDate);
+  yesOption.addEventListener("change", toggleDateInputs);
+  noOption.addEventListener("change", toggleDateInputs);
 });
 
 // ✅ Format BRL properly
