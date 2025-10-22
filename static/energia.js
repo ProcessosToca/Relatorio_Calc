@@ -62,9 +62,8 @@ function setupAddResultEnergia() {
 
     divider.style.display = "block";
 
-    previsaoContainer.innerHTML = `
-      <p class="text-muted mb-1">- ${info}</p>
-      <p class="fw-bold">${parseFloat(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</p>
+    previsaoContainer.innerHTML += `
+      <p class="text-muted mb-1">- ${info} <b>${parseFloat(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</b> <br /></p>
     `;
 
     calculateTotalEnergia();
@@ -173,4 +172,36 @@ function setupAddLine(section) {
 document.addEventListener("DOMContentLoaded", () => {
   ["energia"].forEach(setupAddLine);
   setupAddResultEnergia();
+});
+
+
+// 🧼 Clear Energia inputs after adding the result
+function clearEnergiaInputs() {
+  const fields = [
+    "energia-ultimo",
+    "energia-delivery",
+    "energia-valor",
+    "energia-total",
+    "energia-info"
+  ];
+
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      if (el.tagName === "INPUT") el.value = "";
+      else el.textContent = "";
+    }
+  });
+}
+
+// 🧭 Attach to button click (AFTER your add result logic)
+document.addEventListener("DOMContentLoaded", () => {
+  const addBtn = document.getElementById("energia-add-result");
+  if (!addBtn) return;
+
+  addBtn.addEventListener("click", () => {
+    // ✅ First run your existing logic (which adds previsao)
+    // 👇 If it's already added above, just append this after
+    clearEnergiaInputs();
+  });
 });

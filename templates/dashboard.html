@@ -45,17 +45,6 @@
                     </div>
                 </div>
 
-                <div class="row pb-3 d-flex align-items-center">
-                    <div class="col-6 pb-3 d-flex align-items-center justify-content-center">
-                        <label for="date" class="form-label w-auto"><b>Data ultimo aluguel: </b></label>
-                        <input type="date" id="last-rent" class="form-control w-70 mx-2 w-auto" required>
-                    </div>
-                    <div class="col-6 pb-3 d-flex align-items-center justify-content-center">
-                        <label for="date" class="form-label"><b>Data da Entrega: </b></label>
-                        <input type="date" id="delivery-date" class="form-control mx-2 w-auto" required>
-                    </div>
-                </div>
-
                 <div class="row d-flex align-items-center">
                     <div class="col-6 pb-3 d-flex align-items-center justify-content-center">
                         <label for="date" class="form-label"><b>Data do Aviso: </b></label>
@@ -66,7 +55,16 @@
                         <input type="date" id="final-notice" class="form-control mx-2 w-auto" required>
                     </div>
                 </div>
-
+                <div class="row pb-3 d-flex align-items-center">
+                    <div class="col-6 pb-3 d-flex align-items-center justify-content-center">
+                        <label for="date" class="form-label w-auto"><b>Data ultimo aluguel: </b></label>
+                        <input type="date" id="last-rent" class="form-control w-70 mx-2 w-auto" required>
+                    </div>
+                    <div class="col-6 pb-3 d-flex align-items-center justify-content-center">
+                        <label for="date" class="form-label"><b>Data da Entrega: </b></label>
+                        <input type="date" id="delivery-date" class="form-control mx-2 w-auto" required>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -86,7 +84,7 @@
                 </div>
 
                 <!-- Hidden date inputs -->
-                <div id="dateInputs" class="col-10 m-3" style="display: none;">
+                <div id="dateInputs" class="col-10 m-3" style="display: none; width: 100%;">
                     <div class="row mb-3">
                         <div class="col">
                             <div class="row d-flex align-items-center">
@@ -141,73 +139,19 @@
             </div>
         </div>
 
-        <div class="card shadow-sm mb-4">
-            <div class="card-body d-flex align-items-center flex-wrap gap-3">
-                <h5 class="mb-0">Possui IPTU:</h5>
-
-                <!-- Radio buttons -->
-                <div class="form-check form-check-inline ms-3">
-                    <input class="form-check-input" type="radio" name="showDueDate" id="yesDueDate" value="yes">
-                    <label class="form-check-label" for="yesDueDate">Sim</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="showDueDate" id="noDueDate" value="no" checked>
-                    <label class="form-check-label" for="noDueDate">Não</label>
-                </div>
-
-                <!-- IPTU Inputs (hidden until "Sim") -->
-                <div id="iptu-container" class="ms-3" style="display: none;">
-                    <div class="d-flex align-items-center gap-3 flex-wrap">
-                        <!-- Último Pagamento -->
-                        <div class="col">
-                            <div class="row d-flex align-items-center">
-                                <label for="iptu-ultimo" class="form-label w-auto m-0">Último Pagamento</label>
-                                <input type="date" id="iptu-ultimo" class="form-control w-50">
-                            </div>
-                        </div>
-
-                        <!-- Data de Entrega (mirrored) -->
-                        <div class="col">
-                            <div class="row d-flex align-items-center">
-                                <label for="iptu-delivery" class="form-label w-auto m-0">Data de Entrega</label>
-                                <input type="text" id="iptu-delivery" class="form-control w-50" readonly>
-                            </div>
-                        </div>
-
-                        <!-- Valor do IPTU -->
-                        <div class="col">
-                            <div class="row d-flex align-items-center">
-                                <label for="iptu-value-input" class="form-label w-auto m-0"><b>Valor do
-                                        IPTU:</b></label>
-                                <div class="input-group w-50">
-                                    <span class="input-group-text">R$</span>
-                                    <input type="number" id="iptu-value-input" class="form-control" step="any"
-                                        placeholder="0.00" required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr>
-
-                    <div class="col">
-                        <div class="row d-flex align-items-center">
-                            <label for="iptu-total" class="form-label w-auto m-0"><b>Resultado:</b></label>
-                            <input type="text" id="iptu-total" class="form-control w-50" readonly>
-                        </div>
-                    </div>
-                    <!-- Info text -->
-                    <div class="mt-2">
-                        <small id="iptu-info" class="text-muted small"></small>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Card: Acerto de Dias -->
         <div class="card shadow-sm mt-4">
             <div class="card-body">
-                <h4 class="card-title mb-3">Acerto de Dias</h4>
+                <div class="d-flex justify-content-between">
+                    <h4 class="card-title mb-3">Acerto de Dias</h4>
+                    <span id="possuiMulta" class="multaText" style="display: none; color: red; font-weight: bold;">
+                        Calculo com multa
+                    </span>
+                    <span id="naoPossuiMulta" class="multaText"
+                        style="display: block; color: forestgreen; font-weight: bold;">
+                        Calculo sem multa
+                    </span>
+                </div>
 
                 <div class="row g-3">
                     <div class="col-md-3">
@@ -231,16 +175,95 @@
                 <hr class="my-4">
 
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-6">
                         <label for="acerto-dias" class="form-label fw-bold">Resultado (R$)</label>
                         <input type="text" id="acerto-dias" class="form-control" readonly>
                     </div>
-                    <div class="col-md-6 d-flex align-items-end">
-                        <div id="acerto-info" class="text-muted small"></div>
+                    <div class="col-6 d-flex align-items-end">
+                        <div class="row">
+                            <div id="acerto-tipo-opicional" class="text-danger small" style="color: red;"></div>
+                            <div id="acerto-info" class="text-muted small"></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <div class="card shadow-sm mt-4">
+            <div class="card-body">
+                <h4 class="card-title mb-3">IPTU</h4>
+
+                <!-- IPTU Inputs -->
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="iptu-ultimo" class="form-label">Último Pagamento</label>
+                        <input type="date" id="iptu-ultimo" class="form-control">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="iptu-delivery" class="form-label">Data de Entrega</label>
+                        <input type="text" id="iptu-delivery" class="form-control" readonly>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="iptu-value-input" class="form-label">Valor do IPTU (R$)</label>
+                        <input type="number" id="iptu-value-input" class="form-control" step="any" placeholder="0.00">
+                    </div>
+                </div>
+
+                <!-- Resultado -->
+                <div class="row mt-3">
+                    <label for="iptu-total" class="form-label fw-bold">Resultado (R$)</label>
+                    <div class="row mt-1">
+                        <div class="col-3">
+                            <input type="text" id="iptu-total" class="form-control" readonly>
+                        </div>
+                        <div class="col-6">
+                            <small id="iptu-info" class="text-muted small"></small>
+                        </div>
+                        <div class="col-3 d-flex justify-content-end">
+                            <button type="button" class="btn btn-outline-primary" id="iptu-add-result">
+                                Adicionar ao Final
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 🔽 Add item  -->
+                <hr class="mt-4">
+                <div class="row g-3 align-items-end">
+                    <div class="col-7">
+                        <label for="iptu-desc" class="form-label">Descrição</label>
+                        <input type="text" id="iptu-desc" class="form-control" placeholder="Ex: Parcela IPTU" required>
+                    </div>
+                    <div class="col-2">
+                        <label for="iptu-date" class="form-label">Data de Vencimento</label>
+                        <input type="date" id="iptu-date" class="form-control" required>
+                    </div>
+                    <div class="col-2">
+                        <label for="iptu-value" class="form-label">Valor (R$)</label>
+                        <input type="number" id="iptu-value" class="form-control" step="any" placeholder="0.00"
+                            required>
+                    </div>
+                    <div class="col-1">
+                        <button type="button" class="btn btn-success" id="iptu-add-btn">Adicionar</button>
+                    </div>
+                </div>
+
+                <!-- List of added items -->
+                <ul class="list-group list-group-flush mt-3" id="iptu-list"></ul>
+
+                <!-- Divider for previsões -->
+                <hr class="mt-3" id="iptu-divider" style="display: none;">
+
+                <!-- Preview item container -->
+                <div id="iptu-previsao-container"></div>
+
+                <!-- Second divider and total sum -->
+                <hr class="mt-3" id="iptu-total-divider" style="display: none;">
+                <div id="iptu-soma-container" class="fw-bold"></div>
+            </div>
+        </div>
+
+
 
         <!-- ⚡ Energia -->
         <div class="card shadow-sm mt-4">
@@ -418,40 +441,40 @@
                             </button>
                         </div>
                     </div>
-
-                    <!-- 🔽 Add item  -->
-                    <hr class="mt-4">
-                    <div class="row g-3 align-items-end">
-                        <div class="col-7">
-                            <label for="cond-desc" class="form-label">Descrição</label>
-                            <input type="text" id="cond-desc" class="form-control" placeholder="Ex: Conta de energia"
-                                required>
-                        </div>
-                        <div class="col-2">
-                            <label for="cond-date" class="form-label">Data de Vencimento</label>
-                            <input type="date" id="cond-date" class="form-control" required>
-                        </div>
-                        <div class="col-2">
-                            <label for="cond-value" class="form-label">Valor (R$)</label>
-                            <input type="number" id="cond-value" class="form-control" step="any" placeholder="0.00"
-                                required>
-                        </div>
-                        <div class="col-1">
-                            <button type="button" class="btn btn-success" id="cond-add-btn">Adicionar</button>
-                        </div>
-                    </div>
-
-                    <!-- Lista -->
-                    <ul class="list-group list-group-flush mt-3" id="cond-list"></ul>
-
-                    <!-- Previsão -->
-                    <hr class="mt-3" id="cond-divider" style="display: none;">
-                    <div id="cond-previsao-container"></div>
-
-                    <!-- Total -->
-                    <hr class="mt-3" id="cond-total-divider" style="display: none;">
-                    <div id="cond-soma-container" class="fw-bold"></div>
                 </div>
+
+                <!-- 🔽 Add item  -->
+                <hr class="mt-4">
+                <div class="row g-3 align-items-end">
+                    <div class="col-7">
+                        <label for="cond-desc" class="form-label">Descrição</label>
+                        <input type="text" id="cond-desc" class="form-control" placeholder="Ex: Conta de energia"
+                            required>
+                    </div>
+                    <div class="col-2">
+                        <label for="cond-date" class="form-label">Data de Vencimento</label>
+                        <input type="date" id="cond-date" class="form-control" required>
+                    </div>
+                    <div class="col-2">
+                        <label for="cond-value" class="form-label">Valor (R$)</label>
+                        <input type="number" id="cond-value" class="form-control" step="any" placeholder="0.00"
+                            required>
+                    </div>
+                    <div class="col-1">
+                        <button type="button" class="btn btn-success" id="cond-add-btn">Adicionar</button>
+                    </div>
+                </div>
+
+                <!-- Lista -->
+                <ul class="list-group list-group-flush mt-3" id="cond-list"></ul>
+
+                <!-- Previsão -->
+                <hr class="mt-3" id="cond-divider" style="display: none;">
+                <div id="cond-previsao-container"></div>
+
+                <!-- Total -->
+                <hr class="mt-3" id="cond-total-divider" style="display: none;">
+                <div id="cond-soma-container" class="fw-bold"></div>
             </div>
         </div>
 

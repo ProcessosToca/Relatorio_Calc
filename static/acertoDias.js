@@ -12,47 +12,100 @@ function formatDateBR(dateStr) {
 }
 
 function calculateAcertoDias() {
-  const ultimo   = document.getElementById("acertoDias-ultimo-display")?.value;  // real date input
-  const delivery = document.getElementById("delivery-date")?.value;              // real date input
-  const notice   = document.getElementById("final-notice")?.value;               // real date input
-  const rentVal  = parseFloat(document.getElementById("rent-value")?.value || 0);
+  const ultimo = document.getElementById("acertoDias-ultimo-display")?.value;
+  const delivery = document.getElementById("delivery-date")?.value;
+  const notice = document.getElementById("final-notice")?.value;
+  const rentVal = parseFloat(document.getElementById("rent-value")?.value || 0);
 
   const resultField = document.getElementById("acerto-dias");
-  const info        = document.getElementById("acerto-info");
+  const info = document.getElementById("acerto-info");
+  const tipoOpicional = document.getElementById("acerto-tipo-opicional");
 
-  const delDisp    = document.getElementById("delivery-date-display");
   const noticeDisp = document.getElementById("final-notice-display");
-  const rentDisp   = document.getElementById("rent-value-display");
+  const delDisp = document.getElementById("delivery-date-display");
+  const rentDisp = document.getElementById("rent-value-display");
 
-  if (delDisp)    delDisp.value    = formatDateBR(delivery);
+  // ✅ Display formatted fields
+  if (delDisp) delDisp.value = formatDateBR(delivery);
   if (noticeDisp) noticeDisp.value = formatDateBR(notice);
-  if (rentDisp)   rentDisp.value   = rentVal
+  if (rentDisp) rentDisp.value = rentVal
     ? rentVal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
     : "-";
 
-  // ⛔ missing required fields
+  // ✅ Validate data
   if (!ultimo || !delivery || !notice || !rentVal) {
     resultField.value = "";
     info.textContent = "";
+    tipoOpicional.textContent = "";
     return;
   }
 
+  const ultimoDate = new Date(ultimo);
   const deliveryDate = new Date(delivery);
-  const noticeDate   = new Date(notice);
+  const noticeDate = new Date(notice);
 
+
+  // If both are equal, there's no difference
   if (deliveryDate.getTime() === noticeDate.getTime()) {
     resultField.value = "R$ 0,00";
     info.textContent = "Sem diferença de dias entre a entrega e o aviso.";
     return;
   }
 
-  const diffDays = Math.abs((deliveryDate - noticeDate) / (1000 * 60 * 60 * 24));
   const dailyVal = rentVal / 30;
-  const total    = dailyVal * diffDays;
+  const deliveryFormatted = formatDateBR(delivery);
+  const noticeFormatted = formatDateBR(notice);
+  const ultimoFormatted = formatDateBR(ultimo)
 
-  resultField.value = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-  info.textContent = `Diferença de ${diffDays.toFixed(0)} dia(s) × R$ ${dailyVal.toFixed(2)} por dia.`;
+  // ✅ Check which option was selected
+  const yesSelected = document.getElementById("yesOption").checked;
+  const noSelected = document.getElementById("noOption").checked;
+
+  let total = 0;
+  let diffDays = 0;
+
+  if (yesSelected) {
+    // ✅ YES: original calculation (absolute difference)
+    diffDays = Math.abs((deliveryDate - ultimoDate) / (1000 * 60 * 60 * 24));
+    total = dailyVal * diffDays;
+
+    resultField.value = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    tipoOpicional.textContent = `Possui multa, cobrança de dias até entrega das chaves + a multa:(((${rentVal.toFixed(0)}/30) x ${diffDays.toFixed(0)}) + Multa)`;
+    info.textContent = `Referente ao acerto de ${diffDays.toFixed(0)} dia(s) de aluguel × R$ ${dailyVal.toFixed(2)} por dia (período ${ultimoFormatted} à ${deliveryFormatted}).`;
+
+  } else if (noSelected) {
+    // ✅ NO: special rule — if deliveryDate > noticeDate
+    if (deliveryDate > noticeDate) {
+      diffDays = (deliveryDate - ultimoDate) / (1000 * 60 * 60 * 24);
+      total = dailyVal * diffDays;
+
+      resultField.value = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+      tipoOpicional.textContent = `Sem multa, cobrança de dias até fim do aviso: (((${rentVal.toFixed(0)}/30) x ${diffDays.toFixed(0)}))`;
+      info.textContent = `Cálculo: ${diffDays.toFixed(0)} dia(s) × R$ ${dailyVal.toFixed(2)} (de ${ultimoFormatted} até ${deliveryFormatted}).`;
+    } else if (noticeDate > deliveryDate) {
+      // You said you'll implement another calc here later
+      diffDays = (noticeDate - ultimoDate) / (1000 * 60 * 60 * 24);
+      total = dailyVal * diffDays;
+
+      resultField.value = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+      tipoOpicional.textContent = `Sem multa, cobrança de dias até entrega das chaves: (((${rentVal.toFixed(0)}/30) x ${diffDays.toFixed(0)}))`;
+      info.textContent = `Cálculo: ${diffDays.toFixed(0)} dia(s) × R$ ${dailyVal.toFixed(2)} (de ${ultimoFormatted} até ${noticeFormatted}).`;
+    }
+  }
 }
+
+// ✅ Controla exibição de seções de multa
+document.getElementById("yesOption").addEventListener("change", () => {
+  document.getElementById("possuiMulta").style.display = "block";
+  document.getElementById("naoPossuiMulta").style.display = "none";
+  calculateAcertoDias();
+});
+
+document.getElementById("noOption").addEventListener("change", () => {
+  document.getElementById("possuiMulta").style.display = "none";
+  document.getElementById("naoPossuiMulta").style.display = "block";
+  calculateAcertoDias();
+});
 
 // 🔁 Shared helper
 function getDaysDiff(date1, date2) {
@@ -64,10 +117,10 @@ function getDaysDiff(date1, date2) {
 
 function updateSharedDates() {
   const delivery = document.getElementById("delivery-date")?.value || "";
-  const notice   = document.getElementById("final-notice")?.value || "";
-  document.querySelectorAll("#energia-delivery, #agua-delivery, #cond-delivery")
+  const notice = document.getElementById("final-notice")?.value || "";
+  document.querySelectorAll("#iptu-delivery, #energia-delivery, #agua-delivery, #cond-delivery")
     .forEach(el => el.value = formatDateBR(delivery));
-  document.querySelectorAll("#energia-notice, #agua-notice, #cond-notice")
+  document.querySelectorAll("#iptu-delivery, #energia-notice, #agua-notice, #cond-notice")
     .forEach(el => el.value = formatDateBR(notice));
 }
 

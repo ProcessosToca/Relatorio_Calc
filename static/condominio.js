@@ -110,9 +110,8 @@ function setupAddResultCondominio() {
     }
 
     divider.style.display = "block";
-    previsaoContainer.innerHTML = `
-      <p class="text-muted mb-1">- ${info}</p>
-      <p class="fw-bold">${parseFloat(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</p>
+    previsaoContainer.innerHTML += `
+      <p class="text-muted mb-1">- ${info} <b>${parseFloat(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</b> <br /></p>
     `;
     calculateTotalCondominio();
   });
@@ -145,4 +144,34 @@ function calculateTotalCondominio() {
 document.addEventListener("DOMContentLoaded", () => {
   setupAddLineCondominio();
   setupAddResultCondominio();
+});
+
+// 🧼 Clear Condomínio inputs after adding the result
+function clearCondInputs() {
+  const fields = [
+    "cond-ultimo",
+    "cond-delivery",
+    "cond-valor",
+    "cond-total",
+    "cond-info"
+  ];
+
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      if (el.tagName === "INPUT") el.value = "";
+      else el.textContent = "";
+    }
+  });
+}
+
+// 🧭 Attach to button click
+document.addEventListener("DOMContentLoaded", () => {
+  const addBtn = document.getElementById("cond-add-result");
+  if (!addBtn) return;
+
+  addBtn.addEventListener("click", () => {
+    // ⚡ After previsao logic is executed
+    clearCondInputs();
+  });
 });

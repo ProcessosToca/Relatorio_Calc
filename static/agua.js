@@ -113,9 +113,8 @@ function setupAddResultAgua() {
     }
 
     divider.style.display = "block";
-    previsaoContainer.innerHTML = `
-      <p class="text-muted mb-1">- ${info}</p>
-      <p class="fw-bold">${parseFloat(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</p>
+    previsaoContainer.innerHTML += `
+      <p class="text-muted mb-1">- ${info}<b>${parseFloat(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</b> <br /></p>
     `;
     calculateTotalAgua();
   });
@@ -150,4 +149,34 @@ function calculateTotalAgua() {
 document.addEventListener("DOMContentLoaded", () => {
   setupAddLineAgua();
   setupAddResultAgua();
+});
+
+// 🧼 Clear Água inputs after adding the result
+function clearAguaInputs() {
+  const fields = [
+    "agua-ultimo",
+    "agua-delivery",
+    "agua-valor",
+    "agua-total",
+    "agua-info"
+  ];
+
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      if (el.tagName === "INPUT") el.value = "";
+      else el.textContent = "";
+    }
+  });
+}
+
+// 🧭 Attach to button click
+document.addEventListener("DOMContentLoaded", () => {
+  const addBtn = document.getElementById("agua-add-result");
+  if (!addBtn) return;
+
+  addBtn.addEventListener("click", () => {
+    // ⚡ After your previsao logic is executed
+    clearAguaInputs();
+  });
 });
