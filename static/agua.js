@@ -94,57 +94,73 @@ function setupAddLineAgua() {
   });
 }
 
-// ===== Adicionar Resultado =====
+// ===== Adicionar Resultado (Água) =====
 function setupAddResultAgua() {
-  const resultBtn = document.getElementById("agua-add-result");
-  const aguaTotal = document.getElementById("agua-total");
-  const aguaInfo = document.getElementById("agua-info");
-  const divider = document.getElementById("agua-divider");
-  const previsaoContainer = document.getElementById("agua-previsao-container");
+  const btn = document.getElementById("agua-add-result");
+  const total = document.getElementById("agua-total");
+  const info = document.getElementById("agua-info");
+  const div = document.getElementById("agua-divider");
+  const box = document.getElementById("agua-previsao-container");
 
-  if (!resultBtn) return;
+  if (!btn || !total || !info || !box) return;
 
-  resultBtn.addEventListener("click", () => {
-    const valor = aguaTotal.value.replace(/[^\d,.-]/g, "").replace(",", ".");
-    const info = aguaInfo.textContent.trim();
-    if (!valor || isNaN(parseFloat(valor))) {
+  btn.addEventListener("click", () => {
+    const raw = (total.value || total.textContent || "");
+    const num = parseFloat(raw.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", "."));
+    const text = (info.textContent || "").trim();
+
+    if (!isFinite(num) || num <= 0 || !text) {
       alert("Nenhum resultado de água para adicionar.");
       return;
     }
 
-    divider.style.display = "block";
-    previsaoContainer.innerHTML += `
-      <p class="text-muted mb-1">- ${info}<b>${parseFloat(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</b> <br /></p>
-    `;
+    if (div) div.style.display = "block";
+
+    box.insertAdjacentHTML(
+      "beforeend",
+      `<p class="text-muted mb-1">- ${text} <b style="color: red;">${num.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</b><br></p>`
+    );
+
     calculateTotalAgua();
+    clearAguaInputs(); // limpa os campos após adicionar
   });
 }
 
-// ===== Soma Total =====
+// ===== Soma Total (Água) =====
 function calculateTotalAgua() {
   const list = document.getElementById("agua-list");
-  const previsaoContainer = document.getElementById("agua-previsao-container");
-  const totalDivider = document.getElementById("agua-total-divider");
-  const somaContainer = document.getElementById("agua-soma-container");
+  const box = document.getElementById("agua-previsao-container");
+  const tDiv = document.getElementById("agua-total-divider");
+  const tOut = document.getElementById("agua-soma-container");
 
   let soma = 0;
 
-  list.querySelectorAll("li span").forEach(span => {
-    const match = span.textContent.match(/R\$\s*([\d.,]+)/);
-    if (match) soma += parseFloat(match[1].replace(/\./g, "").replace(",", "."));
-  });
+  // 1️⃣ Somar itens da lista manual
+  if (list) {
+    list.querySelectorAll("li span").forEach(span => {
+      const matches = span.textContent.matchAll(/R\$\s*([\d.,]+)/g);
+      for (const m of matches) soma += parseFloat(m[1].replace(/\./g, "").replace(",", "."));
+    });
+  }
 
-  const previsaoMatch = previsaoContainer.textContent.match(/R\$\s*([\d.,]+)/);
-  if (previsaoMatch) soma += parseFloat(previsaoMatch[1].replace(/\./g, "").replace(",", "."));
+  // 2️⃣ Somar previsões (várias linhas)
+  if (box) {
+    const matches = box.innerText.matchAll(/R\$\s*([\d.,]+)/g);
+    for (const m of matches) soma += parseFloat(m[1].replace(/\./g, "").replace(",", "."));
+  }
 
-  if (soma > 0) {
-    totalDivider.style.display = "block";
-    somaContainer.textContent = `Soma total: ${soma.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`;
-  } else {
-    totalDivider.style.display = "none";
-    somaContainer.textContent = "";
+  // 3️⃣ Atualizar UI
+  if (tOut) {
+    if (soma > 0) {
+      if (tDiv) tDiv.style.display = "block";
+      tOut.textContent = `Soma total: ${soma.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`;
+    } else {
+      if (tDiv) tDiv.style.display = "none";
+      tOut.textContent = "";
+    }
   }
 }
+
 
 document.addEventListener("DOMContentLoaded", () => {
   setupAddLineAgua();

@@ -142,7 +142,7 @@ function setupAddResultIptu() {
     // append one line, keep each on its own line
     box.insertAdjacentHTML(
       "beforeend",
-      `<p class="text-muted mb-1">- ${text} <b>${num.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</b><br></p>`
+      `<p class="text-muted mb-1">- ${text} <b style="color: red;">${num.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</b><br></p>`
     );
 
     calculateTotalIptu();

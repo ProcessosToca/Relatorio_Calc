@@ -40,70 +40,74 @@ function formatDateBR(dateStr) {
   return `${dd}/${mm}/${yyyy}`;
 }
 
-// =============== ADICIONAR RESULTADO ===============
+// =============== ADICIONAR RESULTADO (Energia) ===============
 function setupAddResultEnergia() {
-  const resultBtn = document.getElementById("energia-add-result");
-  const list = document.getElementById("energia-list");
-  const energiaTotal = document.getElementById("energia-total");
-  const energiaInfo = document.getElementById("energia-info");
-  const divider = document.getElementById("energia-divider");
-  const previsaoContainer = document.getElementById("energia-previsao-container");
+  const btn = document.getElementById("energia-add-result");
+  const total = document.getElementById("energia-total");
+  const info = document.getElementById("energia-info");
+  const div = document.getElementById("energia-divider");
+  const box = document.getElementById("energia-previsao-container");
 
-  if (!resultBtn || !energiaTotal || !energiaInfo || !list) return;
+  if (!btn || !total || !info || !box) return;
 
-  resultBtn.addEventListener("click", () => {
-    const valor = energiaTotal.value.replace(/[^\d,.-]/g, "").replace(",", ".");
-    const info = energiaInfo.textContent.trim();
+  btn.addEventListener("click", () => {
+    const raw = (total.value || total.textContent || "");
+    const num = parseFloat(raw.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", "."));
+    const text = (info.textContent || "").trim();
 
-    if (!valor || isNaN(parseFloat(valor))) {
+    if (!isFinite(num) || num <= 0 || !text) {
       alert("Nenhum resultado de energia para adicionar.");
       return;
     }
 
-    divider.style.display = "block";
+    if (div) div.style.display = "block";
 
-    previsaoContainer.innerHTML += `
-      <p class="text-muted mb-1">- ${info} <b>${parseFloat(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</b> <br /></p>
-    `;
+    // ✅ append one previsão per line
+    box.insertAdjacentHTML(
+      "beforeend",
+      `<p class="text-muted mb-1">- ${text} <b style="color: red;">${num.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</b><br></p>`
+    );
 
     calculateTotalEnergia();
+    clearEnergiaInputs(); // clear after adding (same as IPTU logic)
   });
 }
 
-// =============== CALCULAR SOMA TOTAL ===============
+// =============== CALCULAR SOMA TOTAL (Energia) ===============
 function calculateTotalEnergia() {
   const list = document.getElementById("energia-list");
-  const previsaoContainer = document.getElementById("energia-previsao-container");
-  const totalDivider = document.getElementById("energia-total-divider");
-  const somaContainer = document.getElementById("energia-soma-container");
+  const box = document.getElementById("energia-previsao-container");
+  const tDiv = document.getElementById("energia-total-divider");
+  const tOut = document.getElementById("energia-soma-container");
 
   let soma = 0;
 
-  // Somar todos os itens da lista
-  list.querySelectorAll("li span").forEach(span => {
-    const match = span.textContent.match(/R\$\s*([\d.,]+)/);
-    if (match) {
-      const val = parseFloat(match[1].replace(/\./g, "").replace(",", "."));
-      soma += val;
-    }
-  });
-
-  // Somar previsão se existir
-  const previsaoText = previsaoContainer.textContent;
-  const previsaoMatch = previsaoText.match(/R\$\s*([\d.,]+)/);
-  if (previsaoMatch) {
-    const previsaoVal = parseFloat(previsaoMatch[1].replace(/\./g, "").replace(",", "."));
-    soma += previsaoVal;
+  // 1️⃣ Somar todos os itens da lista manual
+  if (list) {
+    list.querySelectorAll("li span").forEach(span => {
+      const matches = span.textContent.matchAll(/R\$\s*([\d.,]+)/g);
+      for (const m of matches) soma += parseFloat(m[1].replace(/\./g, "").replace(",", "."));
+    });
   }
 
-  if (soma > 0) {
-    totalDivider.style.display = "block";
-    somaContainer.textContent = `Soma total: ${soma.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`;
-  } else {
-    totalDivider.style.display = "none";
-    somaContainer.textContent = "";
+  // 2️⃣ Somar todas as previsões (múltiplas linhas)
+  if (box) {
+    const matches = box.innerText.matchAll(/R\$\s*([\d.,]+)/g);
+    for (const m of matches) soma += parseFloat(m[1].replace(/\./g, "").replace(",", "."));
+  }
+
+  // 3️⃣ Atualizar UI
+  if (tOut) {
+    if (soma > 0) {
+      if (tDiv) tDiv.style.display = "block";
+      tOut.textContent = `Soma total: ${soma.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`;
+    } else {
+      if (tDiv) tDiv.style.display = "none";
+      tOut.textContent = "";
+    }
   }
 }
+
 
 // =============== LISTA DE ITENS =================
 function setupAddLine(section) {

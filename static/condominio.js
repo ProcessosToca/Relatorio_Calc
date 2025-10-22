@@ -92,54 +92,73 @@ function setupAddLineCondominio() {
   });
 }
 
+// ===== Adicionar Resultado (Condomínio) =====
 function setupAddResultCondominio() {
-  const resultBtn = document.getElementById("cond-add-result");
-  const totalField = document.getElementById("cond-total");
-  const infoField = document.getElementById("cond-info");
-  const divider = document.getElementById("cond-divider");
-  const previsaoContainer = document.getElementById("cond-previsao-container");
+  const btn   = document.getElementById("cond-add-result");
+  const total = document.getElementById("cond-total");
+  const info  = document.getElementById("cond-info");
+  const div   = document.getElementById("cond-divider");
+  const box   = document.getElementById("cond-previsao-container");
 
-  if (!resultBtn) return;
+  if (!btn || !total || !info || !box) return;
 
-  resultBtn.addEventListener("click", () => {
-    const valor = totalField.value.replace(/[^\d,.-]/g, "").replace(",", ".");
-    const info = infoField.textContent.trim();
-    if (!valor || isNaN(parseFloat(valor))) {
+  btn.addEventListener("click", () => {
+    const raw  = (total.value || total.textContent || "");
+    const num  = parseFloat(raw.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", "."));
+    const text = (info.textContent || "").trim();
+
+    if (!isFinite(num) || num <= 0 || !text) {
       alert("Nenhum resultado de condomínio para adicionar.");
       return;
     }
 
-    divider.style.display = "block";
-    previsaoContainer.innerHTML += `
-      <p class="text-muted mb-1">- ${info} <b>${parseFloat(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</b> <br /></p>
-    `;
+    if (div) div.style.display = "block";
+
+    box.insertAdjacentHTML(
+      "beforeend",
+      `<p class="text-muted mb-1">- ${text} <b style="color: red;">${num.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</b><br></p>`
+    );
+
     calculateTotalCondominio();
+    clearCondominioInputs(); // limpa campos após adicionar
   });
 }
 
+// ===== Soma Total (Condomínio) =====
 function calculateTotalCondominio() {
-  const list = document.getElementById("cond-list");
-  const previsaoContainer = document.getElementById("cond-previsao-container");
-  const totalDivider = document.getElementById("cond-total-divider");
-  const somaContainer = document.getElementById("cond-soma-container");
+  const list  = document.getElementById("cond-list");
+  const box   = document.getElementById("cond-previsao-container");
+  const tDiv  = document.getElementById("cond-total-divider");
+  const tOut  = document.getElementById("cond-soma-container");
 
   let soma = 0;
-  list.querySelectorAll("li span").forEach(span => {
-    const match = span.textContent.match(/R\$\s*([\d.,]+)/);
-    if (match) soma += parseFloat(match[1].replace(/\./g, "").replace(",", "."));
-  });
 
-  const previsaoMatch = previsaoContainer.textContent.match(/R\$\s*([\d.,]+)/);
-  if (previsaoMatch) soma += parseFloat(previsaoMatch[1].replace(/\./g, "").replace(",", "."));
+  // 1️⃣ Somar itens manuais
+  if (list) {
+    list.querySelectorAll("li span").forEach(span => {
+      const matches = span.textContent.matchAll(/R\$\s*([\d.,]+)/g);
+      for (const m of matches) soma += parseFloat(m[1].replace(/\./g, "").replace(",", "."));
+    });
+  }
 
-  if (soma > 0) {
-    totalDivider.style.display = "block";
-    somaContainer.textContent = `Soma total: ${soma.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`;
-  } else {
-    totalDivider.style.display = "none";
-    somaContainer.textContent = "";
+  // 2️⃣ Somar previsões (várias linhas)
+  if (box) {
+    const matches = box.innerText.matchAll(/R\$\s*([\d.,]+)/g);
+    for (const m of matches) soma += parseFloat(m[1].replace(/\./g, "").replace(",", "."));
+  }
+
+  // 3️⃣ Atualizar UI
+  if (tOut) {
+    if (soma > 0) {
+      if (tDiv) tDiv.style.display = "block";
+      tOut.textContent = `Soma total: ${soma.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`;
+    } else {
+      if (tDiv) tDiv.style.display = "none";
+      tOut.textContent = "";
+    }
   }
 }
+
 
 document.addEventListener("DOMContentLoaded", () => {
   setupAddLineCondominio();

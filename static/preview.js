@@ -226,3 +226,22 @@ function formatDateBR(dateStr) {
   const [year, month, day] = dateStr.split("-");
   return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`;
 }
+
+  function highlightCurrencyValues() {
+    const preview = document.getElementById('preview-content');
+    if (!preview) return;
+
+    // Regex para pegar valores com R$, espaços normais e &nbsp;
+    const currencyRegex = /R\$(?:\s|&nbsp;)?\d{1,3}(?:\.\d{3})*(?:,\d{2})/g;
+
+    // Substituir sem remover &nbsp;
+    preview.innerHTML = preview.innerHTML.replace(
+      currencyRegex,
+      match => `<b style="color: red;">${match}</b>`
+    );
+  }
+
+  document.addEventListener("DOMContentLoaded", highlightCurrencyValues);
+
+// Roda assim que a página carregar
+document.addEventListener("DOMContentLoaded", highlightCurrencyValues);
