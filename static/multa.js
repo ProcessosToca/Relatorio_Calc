@@ -70,13 +70,17 @@ function mirrorMultaInputs() {
 document.addEventListener("DOMContentLoaded", mirrorMultaInputs);
 
 // ✅ Get difference in months between two dates
-function getMonthsDiff(date1, date2) {
+function getMonthsAndDaysDiff(date1, date2) {
   const d1 = new Date(date1);
   const d2 = new Date(date2);
-  let months = (d1.getFullYear() - d2.getFullYear()) * 12;
-  months += d1.getMonth() - d2.getMonth();
-  return Math.max(0, months);
+  const diffMs = Math.abs(d1 - d2);
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const months = Math.floor(diffDays / 30);
+  const remainingDays = diffDays % 30;
+  return { months, remainingDays };
 }
+
+
 
 // ✅ Calculate Multa Contratual
 function calculateMultaContratual() {
@@ -94,24 +98,34 @@ function calculateMultaContratual() {
     return;
   }
 
-  // Convert BR format (07/10/2025) to ISO so we can calculate
+  // Converter data BR (07/10/2025) para ISO
   const deliveryISO = formatDateISO(deliveryDateStr);
-  const monthsRemaining = getMonthsDiff(finishDateStr, deliveryISO);
+
+  // ✅ Pega meses e dias restantes
+  const { months, remainingDays } = getMonthsAndDaysDiff(finishDateStr, deliveryISO);
 
   const rentValue = Number(
-    rentStr.replace(/[^\d,.-]/g, "").replace(".", "").replace(",", ".")
+    rentStr.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".")
   ) || 0;
 
-  if (monthsRemaining <= 0 || rentValue <= 0 || prazoTotal <= 0) {
+  if ((months <= 0 && remainingDays <= 0) || rentValue <= 0 || prazoTotal <= 0) {
     resultField.value = formatCurrencyBRL(0);
-    infoField.textContent = "Sem multa (dados inválidos ou meses restantes = 0).";
+    infoField.textContent = "Sem multa (dados inválidos ou sem tempo restante).";
     return;
   }
 
-  const penalty = (rentValue * 3 / prazoTotal) * monthsRemaining;
+  // Multa proporcional
+  const penalty = (rentValue * 3 / prazoTotal) * Math.floor(months + remainingDays / 30);
   resultField.value = formatCurrencyBRL(penalty);
-  infoField.textContent = `(${formatCurrencyBRL(rentValue)} × 3 ÷ ${prazoTotal}) × ${monthsRemaining} mês(es) restante(s)`;
+
+  // 📝 Exibe meses e dias no cálculo
+  let timeText = "";
+  if (months > 0) timeText += `${months} mês(es)`;
+  if (remainingDays > 0) timeText += (timeText ? " e " : "") + `${remainingDays} dia(s)`;
+
+  infoField.textContent = `(${formatCurrencyBRL(rentValue)} × 3 ÷ ${prazoTotal}) × ${timeText}`;
 }
+
 
 // ✅ Recalculate when relevant fields change
 document.addEventListener("DOMContentLoaded", () => {
