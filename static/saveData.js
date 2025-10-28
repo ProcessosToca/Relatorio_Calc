@@ -171,37 +171,29 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // 🧹 Clear all saved data and refresh page
-document.addEventListener("DOMContentLoaded", () => {
-  const clearBtn = document.getElementById("clearAll");
-  if (!clearBtn) return;
-
-  clearBtn.addEventListener("click", () => {
-    localStorage.removeItem("relatorioData");
-    location.reload();
-  });
-});
+// Removed duplicate event listener - using the one below with confirmation
 
 // === ✅ Toast Helper ===
-// function showToast(message) {
-//   const toastEl = document.getElementById('toast-message');
-//   const toastBody = toastEl.querySelector('.toast-body');
-//   toastBody.textContent = message;
+function showToast(message) {
+  const toastEl = document.getElementById('toast-message');
+  const toastBody = toastEl.querySelector('.toast-body');
+  toastBody.textContent = message;
 
-//   const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
-//   toast.show();
-// }
+  const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+  toast.show();
+}
 
-// // === 🧹 Clear all saved data ===
-// document.addEventListener("DOMContentLoaded", () => {
-//   const clearBtn = document.getElementById("clearAll");
-//   if (clearBtn) {
-//     clearBtn.addEventListener("click", () => {
-//       const confirmClear = confirm("Tem certeza que deseja limpar todos os dados?");
-//       if (confirmClear) {
-//         localStorage.removeItem("relatorioData");
-//         showToast("✅ Dados limpos com sucesso!");
-//         setTimeout(() => location.reload(), 1000);
-//       }
-//     });
-//   }
-// });
+// === 🧹 Clear all saved data ===
+document.addEventListener("DOMContentLoaded", () => {
+  const clearBtn = document.getElementById("clearAll");
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      const confirmClear = confirm("Tem certeza que deseja limpar todos os dados?");
+      if (confirmClear) {
+        localStorage.removeItem("relatorioData");
+        showToast("✅ Dados limpos com sucesso!");
+        setTimeout(() => location.reload(), 1000);
+      }
+    });
+  }
+});

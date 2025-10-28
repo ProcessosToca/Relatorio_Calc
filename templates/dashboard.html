@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style_dashboard.css') }}">
 </head>
 
@@ -126,12 +126,43 @@
                     </div>
 
                     <div class="row mt-3">
-                        <div class="col-md-6">
+                        <div class="col-2">
                             <label for="multa-contratual" class="form-label fw-bold">Multa Contratual (R$)</label>
-                            <input type="text" id="multa-contratual" class="form-control" readonly>
+                            <input type="text" id="multa-contratual" class="form-control" style="min-width: auto;"
+                                readonly>
                         </div>
-                        <div class="col-md-6 d-flex align-items-end">
+                        <div class="col-8 d-flex align-items-end">
                             <small id="multa-contratual-info" class="text-muted small"></small>
+                        </div>
+                        <div class="col-2 d-flex align-items-end">
+                            <button type="button" class="btn btn-outline-secondary btn-sm ms-2" data-bs-toggle="modal"
+                                data-bs-target="#multaModal">
+                                Ver cálculo
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Modal: Detalhes da Multa -->
+                    <div class="modal fade" id="multaModal" tabindex="-1" aria-labelledby="multaModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog modal-lg modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="multaModalLabel">Cálculo da Multa Contratual (LaTeX)
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Fechar"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p class="text-muted mb-2" id="multa-contexto"></p>
+                                    <div id="multa-math" class="my-3"></div>
+                                    <hr class="my-3">
+                                    <div id="multa-resultado" class="fw-bold"></div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -142,8 +173,10 @@
         <!-- Card: Acerto de Dias -->
         <div class="card shadow-sm mt-4">
             <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <h4 class="card-title mb-3">Acerto de Dias</h4>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <h4 class="card-title mb-3 m-0">Acerto de Dias</h4>
+                    </div>
                     <span id="possuiMulta" class="multaText" style="display: none; color: red; font-weight: bold;">
                         Calculo com multa
                     </span>
@@ -175,15 +208,40 @@
                 <hr class="my-4">
 
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-2">
                         <label for="acerto-dias" class="form-label fw-bold">Resultado (R$)</label>
                         <input type="text" id="acerto-dias" class="form-control" readonly>
                     </div>
-                    <div class="col-6 d-flex align-items-end">
+                    <div class="col-8 d-flex align-items-end">
                         <div class="row">
                             <div id="acerto-tipo-opicional" class="text-danger small" style="color: red;"></div>
                             <div id="acerto-info" class="text-muted small"></div>
                         </div>
+                    </div>
+                    <div class="col-2 d-flex align-items-end justify-content-end">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#acertoModal">Ver cálculo</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Detalhes do Acerto de Dias -->
+        <div class="modal fade" id="acertoModal" tabindex="-1" aria-labelledby="acertoModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="acertoModalLabel">Cálculo do Acerto de Dias</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted mb-2" id="acerto-contexto"></p>
+                        <div id="acerto-steps"></div>
+                        <hr class="my-3">
+                        <div id="acerto-resultado" class="fw-bold"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                     </div>
                 </div>
             </div>
@@ -191,7 +249,9 @@
 
         <div class="card shadow-sm mt-4">
             <div class="card-body">
-                <h4 class="card-title mb-3">IPTU</h4>
+                <div class="d-flex align-items-center gap-2">
+                    <h4 class="card-title mb-3 m-0">IPTU</h4>
+                </div>
 
                 <!-- IPTU Inputs -->
                 <div class="row g-3">
@@ -212,17 +272,21 @@
                 <!-- Resultado -->
                 <div class="row mt-3">
                     <label for="iptu-total" class="form-label fw-bold">Resultado (R$)</label>
-                    <div class="row mt-1">
-                        <div class="col-3">
+                    <div class="row mt-1 d-flex align-items-end">
+                        <div class="col-2">
                             <input type="text" id="iptu-total" class="form-control" readonly>
                         </div>
-                        <div class="col-6">
+                        <div class="col-7">
                             <small id="iptu-info" class="text-muted small"></small>
                         </div>
-                        <div class="col-3 d-flex justify-content-end">
+                        <div class="col-2">
                             <button type="button" class="btn btn-outline-primary" id="iptu-add-result">
                                 Adicionar ao Final
                             </button>
+                        </div>
+                        <div class="col-1 d-flex align-items-end justify-content-end">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#iptuModal">Ver cálculo</button>
                         </div>
                     </div>
                 </div>
@@ -232,7 +296,7 @@
                 <div class="row g-3 align-items-end">
                     <div class="col-7">
                         <label for="iptu-desc" class="form-label">Descrição</label>
-                        <input type="text" id="iptu-desc" class="form-control" placeholder="Ex: Parcela IPTU" required>
+                        <input type="text" id="iptu-desc" class="form-control" placeholder="Vencimento" value="Vencimento" required>
                     </div>
                     <div class="col-2">
                         <label for="iptu-date" class="form-label">Data de Vencimento</label>
@@ -263,12 +327,35 @@
             </div>
         </div>
 
+        <!-- Modal: Detalhes do IPTU -->
+        <div class="modal fade" id="iptuModal" tabindex="-1" aria-labelledby="iptuModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="iptuModalLabel">Cálculo do IPTU</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted mb-2" id="iptu-contexto"></p>
+                        <div id="iptu-steps"></div>
+                        <hr class="my-3">
+                        <div id="iptu-resultado" class="fw-bold"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
 
         <!-- ⚡ Energia -->
         <div class="card shadow-sm mt-4">
             <div class="card-body">
-                <h4 class="card-title mb-3">Energia</h4>
+                <div class="d-flex align-items-center gap-2">
+                    <h4 class="card-title mb-3 m-0">Energia</h4>
+                </div>
                 <div class="row g-3">
                     <div class="col-md-4">
                         <label for="energia-ultimo" class="form-label">Último Pagamento</label>
@@ -285,17 +372,21 @@
                 </div>
                 <div class="row mt-3">
                     <label for="energia-total" class="form-label fw-bold">Resultado (R$)</label>
-                    <div class="row mt-1">
+                    <div class="row mt-1 d-flex align-items-end">
                         <div class="col-3">
                             <input type="text" id="energia-total" class="form-control" readonly>
                         </div>
                         <div class="col-6">
                             <small id="energia-info" class="text-muted small"></small>
                         </div>
-                        <div class="col-3 d-flex justify-content-end">
+                        <div class="col-2">
                             <button type="button" class="btn btn-outline-primary" id="energia-add-result">
                                 Adicionar ao Final
                             </button>
+                        </div>
+                        <div class="col-1 d-flex align-items-end justify-content-end">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#energiaModal">Ver cálculo</button>
                         </div>
                     </div>
                 </div>
@@ -305,7 +396,7 @@
                 <div class="row g-3 align-items-end">
                     <div class="col-7">
                         <label for="energia-desc" class="form-label">Descrição</label>
-                        <input type="text" id="energia-desc" class="form-control" placeholder="Ex: Conta de energia"
+                        <input type="text" id="energia-desc" class="form-control" placeholder="Vencimento" value="Vencimento"
                             required>
                     </div>
                     <div class="col-2">
@@ -337,6 +428,27 @@
             </div>
         </div>
 
+        <!-- Modal: Detalhes da Energia -->
+        <div class="modal fade" id="energiaModal" tabindex="-1" aria-labelledby="energiaModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="energiaModalLabel">Cálculo da Energia</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted mb-2" id="energia-contexto"></p>
+                        <div id="energia-steps"></div>
+                        <hr class="my-3">
+                        <div id="energia-resultado" class="fw-bold"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- 💧 Água -->
         <div class="card shadow-sm mt-4">
             <div class="card-body">
@@ -358,16 +470,20 @@
 
                 <div class="row mt-3">
                     <label for="agua-total" class="form-label fw-bold">Resultado (R$)</label>
-                    <div class="row mt-1">
-                        <div class="col-3">
+                    <div class="row mt-1 d-flex align-items-end">
+                        <div class="col-2">
                             <input type="text" id="agua-total" class="form-control" readonly>
                         </div>
-                        <div class="col-6">
+                        <div class="col-7">
                             <small id="agua-info" class="text-muted small"></small>
                         </div>
-                        <div class="col-3 d-flex justify-content-end">
+                        <div class="col-2">
                             <button type="button" class="btn btn-outline-primary" id="agua-add-result">Adicionar ao
                                 Final</button>
+                        </div>
+                        <div class="col-1 d-flex align-items-end justify-content-end">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#aguaModal">Ver cálculo</button>
                         </div>
                     </div>
                 </div>
@@ -377,7 +493,7 @@
                 <div class="row g-3 align-items-end">
                     <div class="col-7">
                         <label for="agua-desc" class="form-label">Descrição</label>
-                        <input type="text" id="agua-desc" class="form-control" placeholder="Ex: Conta de energia"
+                        <input type="text" id="agua-desc" class="form-control" placeholder="Vencimento" value="Vencimento"
                             required>
                     </div>
                     <div class="col-2">
@@ -407,20 +523,41 @@
             </div>
         </div>
 
+        <!-- Modal: Detalhes da Água -->
+        <div class="modal fade" id="aguaModal" tabindex="-1" aria-labelledby="aguaModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="aguaModalLabel">Cálculo da Água</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted mb-2" id="agua-contexto"></p>
+                        <div id="agua-steps"></div>
+                        <hr class="my-3">
+                        <div id="agua-resultado" class="fw-bold"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- 🏢 Condomínio -->
         <div class="card shadow-sm my-4">
             <div class="card-body">
                 <h4 class="card-title mb-3">Condomínio</h4>
                 <div class="row g-3">
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <label for="cond-ultimo" class="form-label">Último Pagamento</label>
                         <input type="date" id="cond-ultimo" class="form-control">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <label for="cond-delivery" class="form-label">Data de Entrega</label>
                         <input type="text" id="cond-delivery" class="form-control" readonly>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <label for="cond-valor" class="form-label">Valor do Condomínio (R$)</label>
                         <input type="number" id="cond-valor" class="form-control" step="any" placeholder="0.00">
                     </div>
@@ -428,17 +565,21 @@
 
                 <div class="row mt-3">
                     <label for="cond-total" class="form-label fw-bold">Resultado (R$)</label>
-                    <div class="row mt-1">
+                    <div class="row mt-1 d-flex align-items-end">
                         <div class="col-3">
                             <input type="text" id="cond-total" class="form-control" readonly>
                         </div>
                         <div class="col-6">
                             <small id="cond-info" class="text-muted small"></small>
                         </div>
-                        <div class="col-3 d-flex justify-content-end">
+                        <div class="col-2">
                             <button type="button" class="btn btn-outline-primary" id="cond-add-result">
                                 Adicionar Resultado
                             </button>
+                        </div>
+                        <div class="col-1 d-flex align-items-end justify-content-end">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#condModal">Ver cálculo</button>
                         </div>
                     </div>
                 </div>
@@ -448,7 +589,7 @@
                 <div class="row g-3 align-items-end">
                     <div class="col-7">
                         <label for="cond-desc" class="form-label">Descrição</label>
-                        <input type="text" id="cond-desc" class="form-control" placeholder="Ex: Conta de energia"
+                        <input type="text" id="cond-desc" class="form-control" placeholder="Vencimento" value="Vencimento"
                             required>
                     </div>
                     <div class="col-2">
@@ -475,6 +616,27 @@
                 <!-- Total -->
                 <hr class="mt-3" id="cond-total-divider" style="display: none;">
                 <div id="cond-soma-container" class="fw-bold"></div>
+            </div>
+        </div>
+
+        <!-- Modal: Detalhes do Condomínio -->
+        <div class="modal fade" id="condModal" tabindex="-1" aria-labelledby="condModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="condModalLabel">Cálculo do Condomínio</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted mb-2" id="cond-contexto"></p>
+                        <div id="cond-steps"></div>
+                        <hr class="my-3">
+                        <div id="cond-resultado" class="fw-bold"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -534,6 +696,7 @@
                 </div>
             </div>
         </div>
+
         <button onclick="topFunction()" id="myBtnUp" title="Go to top">Topo</button>
         <button onclick="bottomFunction()" id="myBtnDown" title="Go to bottom">Final</button>
 
@@ -547,7 +710,14 @@
         <script src="{{ url_for('static', filename='restoreData.js') }}"></script>
         <script src="{{ url_for('static', filename='saveData.js') }}"></script>
         <script src="{{ url_for('static', filename='taxasExtras.js') }}"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            window.MathJax = {
+                tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+                svg: { fontCache: 'global' }
+            };
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 </body>
 
 </html>

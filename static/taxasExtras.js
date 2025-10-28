@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!date || isNaN(val)) return;
 
     // Build display string from input values (no array state!)
-    const text = `${title} — ${formatDateBRFromISO(date)} — <b style="color: red;"> ${formatCurrencyBRL(val)} </b>`;
+    const text = `${title} — ${formatDateBRFromISO(date)} — ${formatCurrencyBRL(val)}`;
 
     // Append to DOM
     entriesList.appendChild(makeListItem(text));

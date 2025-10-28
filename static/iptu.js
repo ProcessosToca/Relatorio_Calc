@@ -77,13 +77,14 @@ function setupAddLineIptu() {
   });
 
   addBtn.addEventListener("click", () => {
+    const desc = descInput.value.trim();
     const date = dateInput.value;
     const val  = Number((valueInput.value || "").replace(",", "."));
     const li   = document.createElement("li");
     li.className = "list-group-item d-flex justify-content-between align-items-center";
 
     const span = document.createElement("span");
-    span.textContent = `${count}. Vencimento ${formatDateBR(date)}. ${val.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}`;
+    span.textContent = `${count}. ${desc} ${formatDateBR(date)}. ${val.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}`;
 
     const del = document.createElement("button");
     del.className = "btn btn-sm btn-outline-danger ms-3";
@@ -206,5 +207,62 @@ document.addEventListener("DOMContentLoaded", () => {
 
   setupAddLineIptu();
   setupAddResultIptu();
+
+  // Atualiza modal IPTU ao abrir
+  const modal = document.getElementById("iptuModal");
+  if (modal) {
+    modal.addEventListener("show.bs.modal", updateIptuModal);
+  }
 });
+
+// === Modal: passos simples do IPTU ===
+function updateIptuModal() {
+  const ultimoISO   = document.getElementById("iptu-ultimo")?.value || "";
+  const deliveryISO = document.getElementById("delivery-date")?.value || "";
+  const valor       = parseFloat(document.getElementById("iptu-value-input")?.value || 0);
+
+  const ctx = document.getElementById("iptu-contexto");
+  const box = document.getElementById("iptu-steps");
+  const out = document.getElementById("iptu-resultado");
+  if (!ctx || !box || !out) return;
+
+  if (!ultimoISO || !deliveryISO || !valor) {
+    ctx.textContent = "Preencha 'Último pagamento', 'Data de Entrega' e 'Valor do IPTU'.";
+    box.innerHTML = "";
+    out.textContent = "";
+    return;
+  }
+
+  const diffDays = getDaysDiff(ultimoISO, deliveryISO);
+  const daily    = valor / 30;
+  const total    = daily * diffDays;
+
+  ctx.textContent = `Período considerado: ${formatDateBR(ultimoISO)} até ${formatDateBR(deliveryISO)}.`;
+
+  const steps = [];
+  steps.push(`
+    <div class="mb-3 p-3 border rounded bg-light">
+      <h6 class="text-primary mb-2">Passo 1: Valor por dia</h6>
+      <p class="mb-1"><strong>IPTU mensal ÷ 30 = R$ ${daily.toFixed(2)}</strong></p>
+      <small class="text-muted">(R$ ${valor.toFixed(2)} ÷ 30)</small>
+    </div>
+  `);
+  steps.push(`
+    <div class="mb-3 p-3 border rounded bg-light">
+      <h6 class="text-primary mb-2">Passo 2: Quantidade de dias</h6>
+      <p class="mb-1"><strong>${diffDays} dia(s)</strong></p>
+      <small class="text-muted">Entre ${formatDateBR(ultimoISO)} e ${formatDateBR(deliveryISO)}</small>
+    </div>
+  `);
+  steps.push(`
+    <div class="mb-3 p-3 border rounded bg-success text-white">
+      <h6 class="mb-2">Passo 3: Resultado</h6>
+      <p class="mb-1"><strong>R$ ${daily.toFixed(2)} × ${diffDays} = R$ ${total.toFixed(2)}</strong></p>
+      <small>Este é o valor proporcional de IPTU</small>
+    </div>
+  `);
+
+  box.innerHTML = steps.join("");
+  out.textContent = `Resultado: ${total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`;
+}
 

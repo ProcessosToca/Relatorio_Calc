@@ -138,7 +138,7 @@ function setupAddLine(section) {
 
     const leftText = document.createElement("span");
     const brl = val.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-    leftText.textContent = `${count}. Vencimento ${formatDateBR(date)}. ${brl}`;
+    leftText.textContent = `${count}. ${desc} ${formatDateBR(date)}. ${brl}`;
 
     const del = document.createElement("button");
     del.className = "btn btn-sm btn-outline-danger ms-3";
@@ -176,6 +176,12 @@ function setupAddLine(section) {
 document.addEventListener("DOMContentLoaded", () => {
   ["energia"].forEach(setupAddLine);
   setupAddResultEnergia();
+
+  // Atualiza modal Energia ao abrir
+  const modal = document.getElementById("energiaModal");
+  if (modal) {
+    modal.addEventListener("show.bs.modal", updateEnergiaModal);
+  }
 });
 
 
@@ -209,3 +215,54 @@ document.addEventListener("DOMContentLoaded", () => {
     clearEnergiaInputs();
   });
 });
+
+// === Modal: passos simples da Energia ===
+function updateEnergiaModal() {
+  const ultimo = document.getElementById("energia-ultimo")?.value;
+  const delivery = document.getElementById("delivery-date")?.value;
+  const valor = parseFloat(document.getElementById("energia-valor")?.value || 0);
+
+  const ctx = document.getElementById("energia-contexto");
+  const box = document.getElementById("energia-steps");
+  const out = document.getElementById("energia-resultado");
+  if (!ctx || !box || !out) return;
+
+  if (!ultimo || !delivery || !valor) {
+    ctx.textContent = "Preencha 'Último Pagamento', 'Data de Entrega' e 'Valor da Energia'.";
+    box.innerHTML = "";
+    out.textContent = "";
+    return;
+  }
+
+  const diffDays = getDaysDiff(ultimo, delivery);
+  const daily = valor / 30;
+  const total = daily * diffDays;
+
+  ctx.textContent = `Período considerado: ${formatDateBR(ultimo)} até ${formatDateBR(delivery)}.`;
+
+  const steps = [];
+  steps.push(`
+    <div class="mb-3 p-3 border rounded bg-light">
+      <h6 class="text-primary mb-2">Passo 1: Valor por dia</h6>
+      <p class="mb-1"><strong>Energia mensal ÷ 30 = R$ ${daily.toFixed(2)}</strong></p>
+      <small class="text-muted">(R$ ${valor.toFixed(2)} ÷ 30)</small>
+    </div>
+  `);
+  steps.push(`
+    <div class="mb-3 p-3 border rounded bg-light">
+      <h6 class="text-primary mb-2">Passo 2: Quantidade de dias</h6>
+      <p class="mb-1"><strong>${diffDays} dia(s)</strong></p>
+      <small class="text-muted">Entre ${formatDateBR(ultimo)} e ${formatDateBR(delivery)}</small>
+    </div>
+  `);
+  steps.push(`
+    <div class="mb-3 p-3 border rounded bg-success text-white">
+      <h6 class="mb-2">Passo 3: Resultado</h6>
+      <p class="mb-1"><strong>R$ ${daily.toFixed(2)} × ${diffDays} = R$ ${total.toFixed(2)}</strong></p>
+      <small>Este é o valor proporcional de energia</small>
+    </div>
+  `);
+
+  box.innerHTML = steps.join("");
+  out.textContent = `Resultado: ${total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`;
+}

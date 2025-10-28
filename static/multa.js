@@ -123,7 +123,15 @@ function calculateMultaContratual() {
   if (months > 0) timeText += `${months} mês(es)`;
   if (remainingDays > 0) timeText += (timeText ? " e " : "") + `${remainingDays} dia(s)`;
 
-  infoField.textContent = `(${formatCurrencyBRL(rentValue)} × 3 ÷ ${prazoTotal}) × ${timeText}`;
+  // Calcular dias totais e valor por dia
+  const totalDays = months * 30 + remainingDays;
+  const dailyValue = rentValue / 30;
+
+  // Formatar datas para exibição
+  const finishDateFormatted = formatDateBR(finishDateStr);
+  const deliveryDateFormatted = formatDateBR(deliveryISO);
+
+  infoField.textContent = `Previsão referente ao acerto dias sendo ${totalDays} dia(s) de aluguel (período ${finishDateFormatted} à ${deliveryDateFormatted}). ${resultField.value}`;
 }
 
 
@@ -134,3 +142,153 @@ document.addEventListener("DOMContentLoaded", () => {
     if (el) el.addEventListener("input", calculateMultaContratual);
   });
 });
+
+
+// === Montagem LaTeX e Modal ===
+function formatNumberBR(n) {
+  return Number(n).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function buildMultaLatex({ rentValue, prazoTotal, months, remainingDays }) {
+  // Fórmula base que você usa:
+  // penalty = (rentValue * 3 / prazoTotal) * floor(months + remainingDays/30)
+  // Em LaTeX (sem o floor textual): usamos m + d/30 para explicar
+  const m = months || 0;
+  const d = remainingDays || 0;
+
+  return String.raw`
+\[
+\text{Multa} \;=\; \left( \underbrace{\text{R\$}\,${formatNumberBR(rentValue)}}_{\text{aluguel}} \times 3 \;\big/\; ${prazoTotal} \right)
+\;\times\;
+\left( ${m} + \dfrac{${d}}{30} \right)
+\]
+`;
+}
+
+function updateMultaModal() {
+  const rentStr = document.getElementById("rent-value-multa")?.value || "";
+  const prazoTotal = parseFloat(document.getElementById("contract-time")?.value || 0);
+  const deliveryDateStr = document.getElementById("delivery-date-multa")?.value || "";
+  const finishDateStr = document.getElementById("finish-date")?.value || "";
+
+  const rentValue = Number(rentStr.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".")) || 0;
+
+  const ctx = document.getElementById("multa-contexto");
+  const mathBox = document.getElementById("multa-math");
+  const out = document.getElementById("multa-resultado");
+
+  if (!ctx || !mathBox || !out) return;
+
+  // Caso faltem dados, limpar conteúdo
+  if (!rentValue || !prazoTotal || !deliveryDateStr || !finishDateStr) {
+    ctx.textContent = "Preencha os campos de multa para visualizar o cálculo.";
+    mathBox.innerHTML = "";
+    out.textContent = "";
+    if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([mathBox]);
+    return;
+  }
+
+  const deliveryISO = (function (br) {
+    const [dd, mm, yy] = String(br).split("/");
+    return `${yy}-${String(mm).padStart(2, "0")}-${String(dd).padStart(2, "0")}`;
+  })(deliveryDateStr);
+
+  const { months, remainingDays } = getMonthsAndDaysDiff(finishDateStr, deliveryISO);
+
+  // Contexto textual (humano)
+  const tempoStr = [
+    months > 0 ? `${months} mês(es)` : "",
+    remainingDays > 0 ? `${remainingDays} dia(s)` : ""
+  ].filter(Boolean).join(" e ");
+  ctx.textContent = `Prazo restante considerado: ${tempoStr || "0 dia(s)"}.`;
+
+  const fatorTempo = months + (remainingDays / 30);
+  const tempoArred = Math.floor(fatorTempo);
+  const multaPorMes = (rentValue * 3) / prazoTotal;
+  const penalty = multaPorMes * tempoArred;
+
+  // Passos simples (sem LaTeX complexo)
+  const steps = [];
+
+  // 1) Fórmula geral simples
+  steps.push(`
+    <div class="mb-3 p-3 border rounded bg-light">
+      <h6 class="text-primary mb-2">Passo 1: Fórmula Geral</h6>
+      <p class="mb-1"><strong>Multa = (Aluguel × 3 ÷ Prazo Total) × Tempo Restante</strong></p>
+      <small class="text-muted">Onde: Tempo Restante = Meses + (Dias ÷ 30)</small>
+    </div>
+  `);
+
+  // 2) Valores que você tem
+  steps.push(`
+    <div class="mb-3 p-3 border rounded bg-light">
+      <h6 class="text-primary mb-2">Passo 2: Seus Valores</h6>
+      <ul class="mb-0">
+        <li><strong>Aluguel:</strong> R$ ${formatNumberBR(rentValue)}</li>
+        <li><strong>Prazo Total:</strong> ${prazoTotal} meses</li>
+        <li><strong>Tempo Restante:</strong> ${months} meses e ${remainingDays} dias</li>
+      </ul>
+    </div>
+  `);
+
+  // 3) Calcular tempo restante
+  steps.push(`
+    <div class="mb-3 p-3 border rounded bg-light">
+      <h6 class="text-primary mb-2">Passo 3: Calcular Tempo Restante</h6>
+      <p class="mb-1"><strong>${months} + (${remainingDays} ÷ 30) = ${fatorTempo.toFixed(2)}</strong></p>
+      <p class="mb-0"><strong>Arredondando para baixo: ${tempoArred} meses</strong></p>
+    </div>
+  `);
+
+  // 4) Calcular multa por mês
+  steps.push(`
+    <div class="mb-3 p-3 border rounded bg-light">
+      <h6 class="text-primary mb-2">Passo 4: Calcular Multa por Mês</h6>
+      <p class="mb-1"><strong>(R$ ${formatNumberBR(rentValue)} × 3) ÷ ${prazoTotal} = R$ ${formatNumberBR(multaPorMes)}</strong></p>
+      <small class="text-muted">Isso significa que a multa é de R$ ${formatNumberBR(multaPorMes)} por mês restante</small>
+    </div>
+  `);
+
+  // 5) Resultado final
+  steps.push(`
+    <div class="mb-3 p-3 border rounded bg-success text-white">
+      <h6 class="mb-2">Passo 5: Resultado Final</h6>
+      <p class="mb-1"><strong>R$ ${formatNumberBR(multaPorMes)} × ${tempoArred} = R$ ${formatNumberBR(penalty)}</strong></p>
+      <small>Esta é a multa que deve ser paga</small>
+    </div>
+  `);
+
+  // Renderizar todos os passos
+  mathBox.innerHTML = steps.join("");
+
+  // Resultado numérico destacado
+  out.textContent = `Resultado: ${penalty.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`;
+
+  if (window.MathJax && MathJax.typesetPromise) {
+    MathJax.typesetPromise([mathBox]).catch(() => { });
+  }
+}
+
+// Atualiza o modal ao abrir
+document.addEventListener("DOMContentLoaded", () => {
+  const modalEl = document.getElementById("multaModal");
+  if (modalEl) {
+    modalEl.addEventListener("show.bs.modal", updateMultaModal);
+  }
+
+  // Recalcular também quando os inputs relevantes mudarem
+  ["contract-time", "finish-date", "delivery-date", "rent-value"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("input", () => {
+      // espelhos já atualizam rent-value-multa e delivery-date-multa; chamamos update para refletir
+      updateMultaModal();
+    });
+  });
+
+  // Atualiza uma vez na carga (se já houver dados preenchidos/restaurados)
+  // Atualiza uma vez na carga (se já houver dados preenchidos/restaurados)
+  updateMultaModal();
+  });
+
+  // Atualiza uma vez na carga (se já houver dados preenchidos/restaurados)
+  updateMultaModal();

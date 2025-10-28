@@ -12,7 +12,6 @@ async function renderEntries(entries, total) {
   totalEl.textContent = "R$ " + total.toFixed(2);
 }
 
-
 function formatDateBR(dateStr) {
   if (!dateStr) return "";
   const d = new Date(dateStr);

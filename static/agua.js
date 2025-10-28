@@ -59,13 +59,14 @@ function setupAddLineAgua() {
   });
 
   addBtn.addEventListener("click", () => {
+    const desc = descInput.value.trim() || "Vencimento";
     const date = dateInput.value;
     const val = Number(valueInput.value.replace(",", "."));
 
     const li = document.createElement("li");
     li.className = "list-group-item d-flex justify-content-between align-items-center";
     li.innerHTML = `
-      <span>${count}. Vencimento ${formatDateBR(date)}. ${val.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</span>
+      <span>${count}. ${desc} ${formatDateBR(date)}. ${val.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</span>
       <button class="btn btn-sm btn-outline-danger ms-3">❌</button>
     `;
 
@@ -165,6 +166,8 @@ function calculateTotalAgua() {
 document.addEventListener("DOMContentLoaded", () => {
   setupAddLineAgua();
   setupAddResultAgua();
+  const modal = document.getElementById("aguaModal");
+  if (modal) modal.addEventListener("show.bs.modal", updateAguaModal);
 });
 
 // 🧼 Clear Água inputs after adding the result
@@ -196,3 +199,54 @@ document.addEventListener("DOMContentLoaded", () => {
     clearAguaInputs();
   });
 });
+
+// === Modal: passos simples da Água ===
+function updateAguaModal() {
+  const ultimo = document.getElementById("agua-ultimo")?.value;
+  const delivery = document.getElementById("delivery-date")?.value;
+  const valor = parseFloat(document.getElementById("agua-valor")?.value || 0);
+
+  const ctx = document.getElementById("agua-contexto");
+  const box = document.getElementById("agua-steps");
+  const out = document.getElementById("agua-resultado");
+  if (!ctx || !box || !out) return;
+
+  if (!ultimo || !delivery || !valor) {
+    ctx.textContent = "Preencha 'Último Pagamento', 'Data de Entrega' e 'Valor da Água'.";
+    box.innerHTML = "";
+    out.textContent = "";
+    return;
+  }
+
+  const diffDays = getDaysDiff(ultimo, delivery);
+  const daily = valor / 30;
+  const total = daily * diffDays;
+
+  ctx.textContent = `Período considerado: ${formatDateBR(ultimo)} até ${formatDateBR(delivery)}.`;
+
+  const steps = [];
+  steps.push(`
+    <div class="mb-3 p-3 border rounded bg-light">
+      <h6 class="text-primary mb-2">Passo 1: Valor por dia</h6>
+      <p class="mb-1"><strong>Água mensal ÷ 30 = R$ ${daily.toFixed(2)}</strong></p>
+      <small class="text-muted">(R$ ${valor.toFixed(2)} ÷ 30)</small>
+    </div>
+  `);
+  steps.push(`
+    <div class="mb-3 p-3 border rounded bg-light">
+      <h6 class="text-primary mb-2">Passo 2: Quantidade de dias</h6>
+      <p class="mb-1"><strong>${diffDays} dia(s)</strong></p>
+      <small class="text-muted">Entre ${formatDateBR(ultimo)} e ${formatDateBR(delivery)}</small>
+    </div>
+  `);
+  steps.push(`
+    <div class="mb-3 p-3 border rounded bg-success text-white">
+      <h6 class="mb-2">Passo 3: Resultado</h6>
+      <p class="mb-1"><strong>R$ ${daily.toFixed(2)} × ${diffDays} = R$ ${total.toFixed(2)}</strong></p>
+      <small>Este é o valor proporcional de água</small>
+    </div>
+  `);
+
+  box.innerHTML = steps.join("");
+  out.textContent = `Resultado: ${total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`;
+}

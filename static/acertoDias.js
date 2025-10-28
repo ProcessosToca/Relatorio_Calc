@@ -132,4 +132,86 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   calculateAcertoDias();
+
+  // Atualiza modal de Acerto ao abrir
+  const acertoModal = document.getElementById("acertoModal");
+  if (acertoModal) {
+    acertoModal.addEventListener("show.bs.modal", updateAcertoModal);
+  }
 });
+
+// === Modal: passos simples do Acerto de Dias ===
+function updateAcertoModal() {
+  const ultimo = document.getElementById("acertoDias-ultimo-display")?.value;
+  const delivery = document.getElementById("delivery-date")?.value;
+  const notice = document.getElementById("final-notice")?.value;
+  const rentVal = parseFloat(document.getElementById("rent-value")?.value || 0);
+
+  const ctx = document.getElementById("acerto-contexto");
+  const stepsBox = document.getElementById("acerto-steps");
+  const out = document.getElementById("acerto-resultado");
+  if (!ctx || !stepsBox || !out) return;
+
+  if (!ultimo || !delivery || !notice || !rentVal) {
+    ctx.textContent = "Preencha 'Último pagamento', 'Entrega', 'Final do Aviso' e 'Valor do Aluguel'.";
+    stepsBox.innerHTML = "";
+    out.textContent = "";
+    return;
+  }
+
+  const ultimoDate = new Date(ultimo);
+  const deliveryDate = new Date(delivery);
+  const noticeDate = new Date(notice);
+  const dailyVal = rentVal / 30;
+
+  const yesSelected = document.getElementById("yesOption").checked;
+  const noSelected = document.getElementById("noOption").checked;
+
+  let diffDays = 0;
+  let total = 0;
+  let regra = "";
+
+  if (yesSelected) {
+    diffDays = Math.abs((deliveryDate - ultimoDate) / (1000 * 60 * 60 * 24));
+    total = dailyVal * diffDays;
+    regra = "Com multa: dias até a entrega + multa contratual (a multa é somada em outra seção).";
+  } else if (noSelected) {
+    if (deliveryDate > noticeDate) {
+      diffDays = (deliveryDate - ultimoDate) / (1000 * 60 * 60 * 24);
+      total = dailyVal * diffDays;
+      regra = "Sem multa: cobrar até a data da entrega das chaves.";
+    } else {
+      diffDays = (noticeDate - ultimoDate) / (1000 * 60 * 60 * 24);
+      total = dailyVal * diffDays;
+      regra = "Sem multa: cobrar até o final do aviso.";
+    }
+  }
+
+  ctx.textContent = `Regra aplicada: ${regra}`;
+
+  const steps = [];
+  steps.push(`
+    <div class="mb-3 p-3 border rounded bg-light">
+      <h6 class="text-primary mb-2">Passo 1: Valor por dia</h6>
+      <p class="mb-1"><strong>Aluguel ÷ 30 = R$ ${dailyVal.toFixed(2)}</strong></p>
+      <small class="text-muted">(R$ ${rentVal.toFixed(2)} ÷ 30)</small>
+    </div>
+  `);
+  steps.push(`
+    <div class="mb-3 p-3 border rounded bg-light">
+      <h6 class="text-primary mb-2">Passo 2: Quantidade de dias</h6>
+      <p class="mb-1"><strong>${diffDays.toFixed(0)} dia(s)</strong></p>
+      <small class="text-muted">Entre ${formatDateBR(ultimo)} e ${yesSelected ? formatDateBR(delivery) : (deliveryDate > noticeDate ? formatDateBR(delivery) : formatDateBR(notice))}</small>
+    </div>
+  `);
+  steps.push(`
+    <div class="mb-3 p-3 border rounded bg-success text-white">
+      <h6 class="mb-2">Passo 3: Resultado</h6>
+      <p class="mb-1"><strong>R$ ${dailyVal.toFixed(2)} × ${diffDays.toFixed(0)} = R$ ${total.toFixed(2)}</strong></p>
+      <small>Este é o valor do acerto de dias</small>
+    </div>
+  `);
+
+  stepsBox.innerHTML = steps.join("");
+  out.textContent = `Resultado: ${total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`;
+}

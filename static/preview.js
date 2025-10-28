@@ -10,6 +10,59 @@ document.addEventListener("DOMContentLoaded", () => {
     container.appendChild(div);
   }
 
+  // ===== Multa Contratual =====
+  if (data.multa && (data.multa.valor || data.multa.info)) {
+    let infoHTML = "";
+    if (data.multa.info) {
+      let infoArray = [];
+      if (Array.isArray(data.multa.info)) {
+        infoArray = data.multa.info;
+      } else if (typeof data.multa.info === "string") {
+        infoArray = data.multa.info
+          .split(/\n+|\s*-\s*/g)
+          .map(s => s.trim())
+          .filter(Boolean);
+      }
+      infoHTML = `<p>${infoArray.map(line => `- ${line}<br>`).join('')}</p>`;
+    }
+
+    addSection(
+      "Multa Contratual",
+      `
+      ${infoHTML}
+      ${data.multa.valor ? `<strong>${data.multa.valor}</strong>` : ""}
+      `
+    );
+  }
+
+  // ===== IPTU =====
+  if (data.iptu && (data.iptu.list?.length || data.iptu.previsao || data.iptu.total)) {
+    const items = (data.iptu.list || []).map(i => `<li>${i}</li>`).join("");
+
+    let previsaoHTML = "";
+    if (data.iptu.previsao) {
+      let previsaoArray = [];
+      if (Array.isArray(data.iptu.previsao)) {
+        previsaoArray = data.iptu.previsao;
+      } else if (typeof data.iptu.previsao === "string") {
+        previsaoArray = data.iptu.previsao
+          .split(/\n+|\s*-\s*/g)
+          .map(s => s.trim())
+          .filter(Boolean);
+      }
+      previsaoHTML = `<p>${previsaoArray.map(line => `- ${line}<br>`).join('')}</p>`;
+    }
+
+    addSection(
+      "IPTU",
+      `
+      ${items ? `<ul>${items}</ul>` : ""}
+      ${previsaoHTML}
+      ${data.iptu.total ? `<strong>${data.iptu.total}</strong>` : ""}
+      `
+    );
+  }
+
   // ===== Acerto de Dias =====
   if (data.acerto && (data.acerto.valor || data.acerto.info)) {
     let infoHTML = "";
@@ -34,60 +87,6 @@ document.addEventListener("DOMContentLoaded", () => {
     `
     );
   }
-
-  // ===== IPTU =====
-  if (data.iptu && (data.iptu.list?.length || data.iptu.previsao || data.iptu.total)) {
-    const items = (data.iptu.list || []).map(i => `<li>${i}</li>`).join("");
-    
-    let previsaoHTML = "";
-    if (data.iptu.previsao) {
-      let previsaoArray = [];
-      if (Array.isArray(data.iptu.previsao)) {
-        previsaoArray = data.iptu.previsao;
-      } else if (typeof data.iptu.previsao === "string") {
-        previsaoArray = data.iptu.previsao
-          .split(/\n+|\s*-\s*/g)
-          .map(s => s.trim())
-          .filter(Boolean);
-      }
-      previsaoHTML = `<p>${previsaoArray.map(line => `- ${line}<br>`).join('')}</p>`;
-    }
-
-    addSection(
-      "IPTU",
-      `
-    ${items ? `<ul>${items}</ul>` : ""}
-    ${previsaoHTML}
-    ${data.iptu.total ? `<strong>${data.iptu.total}</strong>` : ""}
-    `
-    );
-  }
-
-  // ===== Multa Contratual =====
-  if (data.multa && (data.multa.valor || data.multa.info)) {
-    let infoHTML = "";
-    if (data.multa.info) {
-      let infoArray = [];
-      if (Array.isArray(data.multa.info)) {
-        infoArray = data.multa.info;
-      } else if (typeof data.multa.info === "string") {
-        infoArray = data.multa.info
-          .split(/\n+|\s*-\s*/g)
-          .map(s => s.trim())
-          .filter(Boolean);
-      }
-      infoHTML = `<p>${infoArray.map(line => `- ${line}<br>`).join('')}</p>`;
-    }
-
-    addSection(
-      "Multa Contratual",
-      `
-    ${infoHTML}
-    ${data.multa.valor ? `<strong>${data.multa.valor}</strong>` : ""}
-    `
-    );
-  }
-
 
   // ===== Energia =====
   if (data.energia && (data.energia.list?.length || data.energia.previsao || data.energia.total)) {
@@ -227,21 +226,21 @@ function formatDateBR(dateStr) {
   return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`;
 }
 
-  function highlightCurrencyValues() {
-    const preview = document.getElementById('preview-content');
-    if (!preview) return;
+function highlightCurrencyValues() {
+  const preview = document.getElementById('preview-content');
+  if (!preview) return;
 
-    // Regex para pegar valores com R$, espaços normais e &nbsp;
-    const currencyRegex = /R\$(?:\s|&nbsp;)?\d{1,3}(?:\.\d{3})*(?:,\d{2})/g;
+  // Regex para pegar valores com R$, espaços normais e &nbsp;
+  const currencyRegex = /R\$(?:\s|&nbsp;)?\d{1,3}(?:\.\d{3})*(?:,\d{2})/g;
 
-    // Substituir sem remover &nbsp;
-    preview.innerHTML = preview.innerHTML.replace(
-      currencyRegex,
-      match => `<b style="color: red;">${match}</b>`
-    );
-  }
+  // Substituir sem remover &nbsp;
+  preview.innerHTML = preview.innerHTML.replace(
+    currencyRegex,
+    match => `<b style="color: red;">${match}</b>`
+  );
+}
 
-  document.addEventListener("DOMContentLoaded", highlightCurrencyValues);
+document.addEventListener("DOMContentLoaded", highlightCurrencyValues);
 
 // Roda assim que a página carregar
 document.addEventListener("DOMContentLoaded", highlightCurrencyValues);
