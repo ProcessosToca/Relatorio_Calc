@@ -36,7 +36,6 @@ function calculateAcertoDias() {
   if (!ultimo || !delivery || !notice || !rentVal) {
     resultField.value = "";
     info.textContent = "";
-    tipoOpicional.textContent = "";
     return;
   }
 
@@ -70,7 +69,6 @@ function calculateAcertoDias() {
     total = dailyVal * diffDays;
 
     resultField.value = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-    tipoOpicional.textContent = `Possui multa, cobrança de dias até entrega das chaves + a multa:(((${rentVal.toFixed(0)}/30) x ${diffDays.toFixed(0)}) + Multa)`;
     info.textContent = `Referente ao acerto de ${diffDays.toFixed(0)} dia(s) de aluguel × R$ ${dailyVal.toFixed(2)} por dia (período ${ultimoFormatted} à ${deliveryFormatted}).`;
 
   } else if (noSelected) {
@@ -80,7 +78,6 @@ function calculateAcertoDias() {
       total = dailyVal * diffDays;
 
       resultField.value = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-      tipoOpicional.textContent = `Sem multa, cobrança de dias até fim do aviso: (((${rentVal.toFixed(0)}/30) x ${diffDays.toFixed(0)}))`;
       info.textContent = `Previsão referente a ${diffDays.toFixed(0)} dia(s) de aluguel × R$ ${dailyVal.toFixed(2)} (Período de ${ultimoFormatted} até ${deliveryFormatted}).`;
     } else if (noticeDate > deliveryDate) {
       // You said you'll implement another calc here later
@@ -88,7 +85,6 @@ function calculateAcertoDias() {
       total = dailyVal * diffDays;
 
       resultField.value = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-      tipoOpicional.textContent = `Sem multa, cobrança de dias até entrega das chaves: (((${rentVal.toFixed(0)}/30) x ${diffDays.toFixed(0)}))`;
       info.textContent = `Previsão referente a ${diffDays.toFixed(0)} dia(s) de aluguel × R$ ${dailyVal.toFixed(2)} (Período de ${ultimoFormatted} até ${noticeFormatted}).`;
     }
   }

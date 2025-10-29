@@ -59,7 +59,7 @@ function setupAddLineAgua() {
   });
 
   addBtn.addEventListener("click", () => {
-    const desc = descInput.value.trim() || "Vencimento";
+    const desc = descInput.value.trim();
     const date = dateInput.value;
     const val = Number(valueInput.value.replace(",", "."));
 

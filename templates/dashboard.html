@@ -5,719 +5,762 @@
     <meta charset="UTF-8">
     <title>Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style_dashboard.css') }}">
 </head>
 
 <body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
-            <span class="navbar-brand">Calculadors de recisão</span>
-            <a href="{{ url_for('logout') }}" class="btn btn-light btn-sm">Logout</a>
-        </div>
-    </nav>
-
-    <div class="container py-5">
-        <div class="card shadow-sm mb-4">
-            <div class="card-body p-4">
-                <div class="row pb-3 d-flex align-items-center">
-                    <div class="col-6 pb-3 d-flex align-items-center">
-                        <label for="text" class="form-label w-auto"><b>Endereço: </b></label>
-                        <input type="text" id="address-info" class="form-control mx-2" required>
-                    </div>
-                    <div class="col-6 pb-3 d-flex align-items-center">
-                        <label for="text" class="form-label w-auto"><b>Nome: </b></label>
-                        <input type="text" id="tenant-name" class="form-control mx-2" required>
-                    </div>
-                </div>
-
-                <div class="row pb-3 d-flex align-items-center">
-                    <div class="col-6 pb-3 d-flex align-items-center">
-                        <label for="date" class="form-label w-auto"><b>Contrato: </b></label>
-                        <input type="number" id="contract-number" class="form-control mx-2" required>
-                    </div>
-                    <div class="col-6 pb-3 d-flex align-items-center">
-                        <label for="date" class="form-label w-auto"><b>Valor Alguel: </b></label>
-                        <div class="input-group mx-3">
-                            <span class="input-group-text">R$</span>
-                            <input type="number" id="rent-value" class="form-control" step="any" placeholder="0.00"
-                                required>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row d-flex align-items-center">
-                    <div class="col-6 pb-3 d-flex align-items-center justify-content-center">
-                        <label for="date" class="form-label"><b>Data do Aviso: </b></label>
-                        <input type="date" id="notice-date" class="form-control mx-2 w-auto" required>
-                    </div>
-                    <div class="col-6 pb-3 d-flex align-items-center justify-content-center">
-                        <label for="date" class="form-label"><b>Final do Aviso: </b></label>
-                        <input type="date" id="final-notice" class="form-control mx-2 w-auto" required>
-                    </div>
-                </div>
-                <div class="row pb-3 d-flex align-items-center">
-                    <div class="col-6 pb-3 d-flex align-items-center justify-content-center">
-                        <label for="date" class="form-label w-auto"><b>Data ultimo aluguel: </b></label>
-                        <input type="date" id="last-rent" class="form-control w-70 mx-2 w-auto" required>
-                    </div>
-                    <div class="col-6 pb-3 d-flex align-items-center justify-content-center">
-                        <label for="date" class="form-label"><b>Data da Entrega: </b></label>
-                        <input type="date" id="delivery-date" class="form-control mx-2 w-auto" required>
-                    </div>
-                </div>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <img src="/static/images/toca.jfif.crdownload" alt="Toca Logo" class="logo-img">
+                <span class="brand-name">Toca Imóveis</span>
             </div>
         </div>
 
-        <div class="card shadow-sm mb-4">
-            <div class="card-body card-body d-flex align-items-center flex-wrap gap-3">
+        <!-- <div class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" placeholder="Pesquisar..." class="search-input">
+            </div>
+        </div> -->
 
-                <h5 class="m-0">Possui multa:</h5>
+        <div class="menu-items">
+            <a href="/dashboard" class="menu-item active">
+                <i class="fas fa-calculator menu-icon"></i>
+                <span class="menu-text">Calculadora</span>
+            </a>
+        </div>
 
-                <!-- Radio buttons -->
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="includeDates" id="yesOption" value="yes">
-                    <label class="form-check-label" for="yesOption">Sim</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="includeDates" id="noOption" value="no" checked>
-                    <label class="form-check-label" for="noOption">Não</label>
-                </div>
+        <div class="sidebar-footer">
+            <a href="{{ url_for('logout') }}" class="logout-btn d-flex justify-content-center">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Sair</span>
+            </a>
+        </div>
+    </div>
 
-                <!-- Hidden date inputs -->
-                <div id="dateInputs" class="col-10 m-3" style="display: none; width: 100%;">
-                    <div class="row mb-3">
-                        <div class="col">
-                            <div class="row d-flex align-items-center">
-                                <label for="finish-date" class="form-label w-auto m-0"> <b>Data término do
-                                        contrato: </b></label>
-                                <input type="date" id="finish-date" class="form-control w-auto">
-                            </div>
+    <!-- External toggle tab (outside the sidebar) -->
+    <button class="sidebar-toggle-tab" id="sidebarToggleTab" aria-label="Alternar menu">
+        <i class="fas fa-angle-left"></i>
+    </button>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="container py-5">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="row pb-3 d-flex align-items-center">
+                        <div class="col-6 pb-3 d-flex align-items-center">
+                            <label for="text" class="form-label w-auto"><b>Endereço: </b></label>
+                            <input type="text" id="address-info" class="form-control mx-2" required>
                         </div>
-                        <div class="col">
-                            <div class="row d-flex align-items-center">
-                                <label for="contract-time" class="form-label w-auto m-0"><b>Prazo total do
-                                        contrato:</b></label>
-                                <div class="input-group w-50">
-                                    <span class="col input-group-text w-50">Meses</span>
-                                    <input type="number" id="contract-time" class="col form-control w-50" step="any"
-                                        placeholder="0" required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col">
-                            <div class="row d-flex align-items-center">
-                                <label for="delivery-date-multa" class="form-label w-auto m-0"><b>Data de
-                                        Entrega:</b></label>
-                                <input type="text" id="delivery-date-multa" class="form-control w-auto" readonly>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="row d-flex align-items-center">
-                                <label for="rent-value-multa" class="form-label w-auto m-0"><b>Valor
-                                        Aluguel:</b></label>
-                                <div class="input-group w-50">
-                                    <span class="input-group-text">R$</span>
-                                    <input type="text" id="rent-value-multa" class="form-control" readonly>
-                                </div>
-                            </div>
+                        <div class="col-6 pb-3 d-flex align-items-center">
+                            <label for="text" class="form-label w-auto"><b>Nome: </b></label>
+                            <input type="text" id="tenant-name" class="form-control mx-2" required>
                         </div>
                     </div>
 
-                    <div class="row mt-3">
+                    <div class="row pb-3 d-flex align-items-center">
+                        <div class="col-6 pb-3 d-flex align-items-center">
+                            <label for="date" class="form-label w-auto"><b>Contrato: </b></label>
+                            <input type="number" id="contract-number" class="form-control mx-2" required>
+                        </div>
+                        <div class="col-6 pb-3 d-flex align-items-center">
+                            <label for="date" class="form-label w-auto"><b>Valor Alguel: </b></label>
+                            <div class="input-group mx-3">
+                                <span class="input-group-text">R$</span>
+                                <input type="number" id="rent-value" class="form-control" step="any" placeholder="0.00"
+                                    required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row d-flex align-items-center">
+                        <div class="col-6 pb-3 d-flex align-items-center justify-content-center">
+                            <label for="date" class="form-label"><b>Data do Aviso: </b></label>
+                            <input type="date" id="notice-date" class="form-control mx-2 w-auto" required>
+                        </div>
+                        <div class="col-6 pb-3 d-flex align-items-center justify-content-center">
+                            <label for="date" class="form-label"><b>Final do Aviso: </b></label>
+                            <input type="date" id="final-notice" class="form-control mx-2 w-auto" required>
+                        </div>
+                    </div>
+                    <div class="row pb-3 d-flex align-items-center">
+                        <div class="col-6 pb-3 d-flex align-items-center justify-content-center">
+                            <label for="date" class="form-label w-auto"><b>Data ultimo aluguel: </b></label>
+                            <input type="date" id="last-rent" class="form-control w-70 mx-2 w-auto" required>
+                        </div>
+                        <div class="col-6 pb-3 d-flex align-items-center justify-content-center">
+                            <label for="date" class="form-label"><b>Data da Entrega: </b></label>
+                            <input type="date" id="delivery-date" class="form-control mx-2 w-auto" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body card-body d-flex align-items-center flex-wrap gap-3">
+
+                    <h5 class="m-0">Possui multa:</h5>
+
+                    <!-- Radio buttons -->
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="includeDates" id="yesOption" value="yes">
+                        <label class="form-check-label" for="yesOption">Sim</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="includeDates" id="noOption" value="no"
+                            checked>
+                        <label class="form-check-label" for="noOption">Não</label>
+                    </div>
+
+                    <!-- Hidden date inputs -->
+                    <div id="dateInputs" class="col-10 m-3" style="display: none; width: 100%;">
+                        <div class="row mb-3">
+                            <div class="col">
+                                <div class="row d-flex align-items-center">
+                                    <label for="finish-date" class="form-label w-auto m-0"> <b>Data término do
+                                            contrato: </b></label>
+                                    <input type="date" id="finish-date" class="form-control w-auto">
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="row d-flex align-items-center">
+                                    <label for="contract-time" class="form-label w-auto m-0"><b>Prazo total do
+                                            contrato:</b></label>
+                                    <div class="input-group w-50">
+                                        <span class="col input-group-text w-50">Meses</span>
+                                        <input type="number" id="contract-time" class="col form-control w-50" step="any"
+                                            placeholder="0" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <div class="row d-flex align-items-center">
+                                    <label for="delivery-date-multa" class="form-label w-auto m-0"><b>Data de
+                                            Entrega:</b></label>
+                                    <input type="text" id="delivery-date-multa" class="form-control w-auto" readonly>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="row d-flex align-items-center">
+                                    <label for="rent-value-multa" class="form-label w-auto m-0"><b>Valor
+                                            Aluguel:</b></label>
+                                    <div class="input-group w-50">
+                                        <span class="input-group-text">R$</span>
+                                        <input type="text" id="rent-value-multa" class="form-control" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-2">
+                                <label for="multa-contratual" class="form-label fw-bold">Multa Contratual (R$)</label>
+                                <input type="text" id="multa-contratual" class="form-control" style="min-width: auto;"
+                                    readonly>
+                            </div>
+                            <div class="col-8 d-flex align-items-end">
+                                <small id="multa-contratual-info" class="text-muted small"></small>
+                            </div>
+                            <div class="col-2 d-flex align-items-end">
+                                <button type="button" class="btn btn-outline-secondary btn-sm ms-2"
+                                    data-bs-toggle="modal" data-bs-target="#multaModal">
+                                    Ver cálculo
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Modal: Detalhes da Multa -->
+                        <div class="modal fade" id="multaModal" tabindex="-1" aria-labelledby="multaModalLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="multaModalLabel">Cálculo da Multa Contratual (LaTeX)
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Fechar"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p class="text-muted mb-2" id="multa-contexto"></p>
+                                        <div id="multa-math" class="my-3"></div>
+                                        <hr class="my-3">
+                                        <div id="multa-resultado" class="fw-bold"></div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card: Acerto de Dias -->
+            <div class="card shadow-sm mt-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <h4 class="card-title mb-3 m-0">Acerto de Dias</h4>
+                        </div>
+                        <span id="possuiMulta" class="multaText" style="display: none; color: red; font-weight: bold;">
+                            Calculo com multa
+                        </span>
+                        <span id="naoPossuiMulta" class="multaText"
+                            style="display: block; color: forestgreen; font-weight: bold;">
+                            Calculo sem multa
+                        </span>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label for="acertoDias-ultimo-display" class="form-label">Último Pagamento</label>
+                            <input type="date" id="acertoDias-ultimo-display" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="delivery-date-display" class="form-label">Data de Entrega</label>
+                            <input type="text" id="delivery-date-display" class="form-control" readonly>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="final-notice-display" class="form-label">Final do Aviso</label>
+                            <input type="text" id="final-notice-display" class="form-control" readonly>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="rent-value-display" class="form-label">Valor do Aluguel</label>
+                            <input type="text" id="rent-value-display" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="row">
                         <div class="col-2">
-                            <label for="multa-contratual" class="form-label fw-bold">Multa Contratual (R$)</label>
-                            <input type="text" id="multa-contratual" class="form-control" style="min-width: auto;"
-                                readonly>
+                            <label for="acerto-dias" class="form-label fw-bold">Resultado (R$)</label>
+                            <input type="text" id="acerto-dias" class="form-control" readonly>
                         </div>
                         <div class="col-8 d-flex align-items-end">
-                            <small id="multa-contratual-info" class="text-muted small"></small>
-                        </div>
-                        <div class="col-2 d-flex align-items-end">
-                            <button type="button" class="btn btn-outline-secondary btn-sm ms-2" data-bs-toggle="modal"
-                                data-bs-target="#multaModal">
-                                Ver cálculo
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Modal: Detalhes da Multa -->
-                    <div class="modal fade" id="multaModal" tabindex="-1" aria-labelledby="multaModalLabel"
-                        aria-hidden="true">
-                        <div class="modal-dialog modal-lg modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="multaModalLabel">Cálculo da Multa Contratual (LaTeX)
-                                    </h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Fechar"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <p class="text-muted mb-2" id="multa-contexto"></p>
-                                    <div id="multa-math" class="my-3"></div>
-                                    <hr class="my-3">
-                                    <div id="multa-resultado" class="fw-bold"></div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                                </div>
+                            <div class="row">
+                                <div id="acerto-tipo-opicional" class="text-danger small" style="color: red;"></div>
+                                <div id="acerto-info" class="text-muted small"></div>
                             </div>
                         </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-        <!-- Card: Acerto de Dias -->
-        <div class="card shadow-sm mt-4">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center gap-2">
-                        <h4 class="card-title mb-3 m-0">Acerto de Dias</h4>
-                    </div>
-                    <span id="possuiMulta" class="multaText" style="display: none; color: red; font-weight: bold;">
-                        Calculo com multa
-                    </span>
-                    <span id="naoPossuiMulta" class="multaText"
-                        style="display: block; color: forestgreen; font-weight: bold;">
-                        Calculo sem multa
-                    </span>
-                </div>
-
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <label for="acertoDias-ultimo-display" class="form-label">Último Pagamento</label>
-                        <input type="date" id="acertoDias-ultimo-display" class="form-control">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="delivery-date-display" class="form-label">Data de Entrega</label>
-                        <input type="text" id="delivery-date-display" class="form-control" readonly>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="final-notice-display" class="form-label">Final do Aviso</label>
-                        <input type="text" id="final-notice-display" class="form-control" readonly>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="rent-value-display" class="form-label">Valor do Aluguel</label>
-                        <input type="text" id="rent-value-display" class="form-control" readonly>
-                    </div>
-                </div>
-
-                <hr class="my-4">
-
-                <div class="row">
-                    <div class="col-2">
-                        <label for="acerto-dias" class="form-label fw-bold">Resultado (R$)</label>
-                        <input type="text" id="acerto-dias" class="form-control" readonly>
-                    </div>
-                    <div class="col-8 d-flex align-items-end">
-                        <div class="row">
-                            <div id="acerto-tipo-opicional" class="text-danger small" style="color: red;"></div>
-                            <div id="acerto-info" class="text-muted small"></div>
-                        </div>
-                    </div>
-                    <div class="col-2 d-flex align-items-end justify-content-end">
-                        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#acertoModal">Ver cálculo</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal: Detalhes do Acerto de Dias -->
-        <div class="modal fade" id="acertoModal" tabindex="-1" aria-labelledby="acertoModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="acertoModalLabel">Cálculo do Acerto de Dias</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p class="text-muted mb-2" id="acerto-contexto"></p>
-                        <div id="acerto-steps"></div>
-                        <hr class="my-3">
-                        <div id="acerto-resultado" class="fw-bold"></div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card shadow-sm mt-4">
-            <div class="card-body">
-                <div class="d-flex align-items-center gap-2">
-                    <h4 class="card-title mb-3 m-0">IPTU</h4>
-                </div>
-
-                <!-- IPTU Inputs -->
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label for="iptu-ultimo" class="form-label">Último Pagamento</label>
-                        <input type="date" id="iptu-ultimo" class="form-control">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="iptu-delivery" class="form-label">Data de Entrega</label>
-                        <input type="text" id="iptu-delivery" class="form-control" readonly>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="iptu-value-input" class="form-label">Valor do IPTU (R$)</label>
-                        <input type="number" id="iptu-value-input" class="form-control" step="any" placeholder="0.00">
-                    </div>
-                </div>
-
-                <!-- Resultado -->
-                <div class="row mt-3">
-                    <label for="iptu-total" class="form-label fw-bold">Resultado (R$)</label>
-                    <div class="row mt-1 d-flex align-items-end">
-                        <div class="col-2">
-                            <input type="text" id="iptu-total" class="form-control" readonly>
-                        </div>
-                        <div class="col-7">
-                            <small id="iptu-info" class="text-muted small"></small>
-                        </div>
-                        <div class="col-2">
-                            <button type="button" class="btn btn-outline-primary" id="iptu-add-result">
-                                Adicionar ao Final
-                            </button>
-                        </div>
-                        <div class="col-1 d-flex align-items-end justify-content-end">
+                        <div class="col-2 d-flex align-items-end justify-content-end">
                             <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#iptuModal">Ver cálculo</button>
+                                data-bs-target="#acertoModal">Ver cálculo</button>
                         </div>
-                    </div>
-                </div>
-
-                <!-- 🔽 Add item  -->
-                <hr class="mt-4">
-                <div class="row g-3 align-items-end">
-                    <div class="col-7">
-                        <label for="iptu-desc" class="form-label">Descrição</label>
-                        <input type="text" id="iptu-desc" class="form-control" placeholder="Vencimento" value="Vencimento" required>
-                    </div>
-                    <div class="col-2">
-                        <label for="iptu-date" class="form-label">Data de Vencimento</label>
-                        <input type="date" id="iptu-date" class="form-control" required>
-                    </div>
-                    <div class="col-2">
-                        <label for="iptu-value" class="form-label">Valor (R$)</label>
-                        <input type="number" id="iptu-value" class="form-control" step="any" placeholder="0.00"
-                            required>
-                    </div>
-                    <div class="col-1">
-                        <button type="button" class="btn btn-success" id="iptu-add-btn">Adicionar</button>
-                    </div>
-                </div>
-
-                <!-- List of added items -->
-                <ul class="list-group list-group-flush mt-3" id="iptu-list"></ul>
-
-                <!-- Divider for previsões -->
-                <hr class="mt-3" id="iptu-divider" style="display: none;">
-
-                <!-- Preview item container -->
-                <div id="iptu-previsao-container"></div>
-
-                <!-- Second divider and total sum -->
-                <hr class="mt-3" id="iptu-total-divider" style="display: none;">
-                <div id="iptu-soma-container" class="fw-bold"></div>
-            </div>
-        </div>
-
-        <!-- Modal: Detalhes do IPTU -->
-        <div class="modal fade" id="iptuModal" tabindex="-1" aria-labelledby="iptuModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="iptuModalLabel">Cálculo do IPTU</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p class="text-muted mb-2" id="iptu-contexto"></p>
-                        <div id="iptu-steps"></div>
-                        <hr class="my-3">
-                        <div id="iptu-resultado" class="fw-bold"></div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                     </div>
                 </div>
             </div>
-        </div>
 
-
-
-        <!-- ⚡ Energia -->
-        <div class="card shadow-sm mt-4">
-            <div class="card-body">
-                <div class="d-flex align-items-center gap-2">
-                    <h4 class="card-title mb-3 m-0">Energia</h4>
-                </div>
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label for="energia-ultimo" class="form-label">Último Pagamento</label>
-                        <input type="date" id="energia-ultimo" class="form-control">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="energia-delivery" class="form-label">Data de Entrega</label>
-                        <input type="text" id="energia-delivery" class="form-control" readonly>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="energia-valor" class="form-label">Valor da Energia (R$)</label>
-                        <input type="number" id="energia-valor" class="form-control" step="any" placeholder="0.00">
-                    </div>
-                </div>
-                <div class="row mt-3">
-                    <label for="energia-total" class="form-label fw-bold">Resultado (R$)</label>
-                    <div class="row mt-1 d-flex align-items-end">
-                        <div class="col-3">
-                            <input type="text" id="energia-total" class="form-control" readonly>
+            <!-- Modal: Detalhes do Acerto de Dias -->
+            <div class="modal fade" id="acertoModal" tabindex="-1" aria-labelledby="acertoModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="acertoModalLabel">Cálculo do Acerto de Dias</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Fechar"></button>
                         </div>
-                        <div class="col-6">
-                            <small id="energia-info" class="text-muted small"></small>
+                        <div class="modal-body">
+                            <p class="text-muted mb-2" id="acerto-contexto"></p>
+                            <div id="acerto-steps"></div>
+                            <hr class="my-3">
+                            <div id="acerto-resultado" class="fw-bold"></div>
                         </div>
-                        <div class="col-2">
-                            <button type="button" class="btn btn-outline-primary" id="energia-add-result">
-                                Adicionar ao Final
-                            </button>
-                        </div>
-                        <div class="col-1 d-flex align-items-end justify-content-end">
-                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#energiaModal">Ver cálculo</button>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                         </div>
                     </div>
                 </div>
-
-                <!-- 🔽 Add item  -->
-                <hr class="mt-4">
-                <div class="row g-3 align-items-end">
-                    <div class="col-7">
-                        <label for="energia-desc" class="form-label">Descrição</label>
-                        <input type="text" id="energia-desc" class="form-control" placeholder="Vencimento" value="Vencimento"
-                            required>
-                    </div>
-                    <div class="col-2">
-                        <label for="energia-date" class="form-label">Data de Vencimento</label>
-                        <input type="date" id="energia-date" class="form-control" required>
-                    </div>
-                    <div class="col-2">
-                        <label for="energia-value" class="form-label">Valor (R$)</label>
-                        <input type="number" id="energia-value" class="form-control" step="any" placeholder="0.00"
-                            required>
-                    </div>
-                    <div class="col-1">
-                        <button type="button" class="btn btn-success" id="energia-add-btn">Adicionar</button>
-                    </div>
-                </div>
-
-                <!-- List of added items -->
-                <ul class="list-group list-group-flush mt-3" id="energia-list"></ul>
-
-                <!-- Divider for previsões -->
-                <hr class="mt-3" id="energia-divider" style="display: none;">
-
-                <!-- Preview item container -->
-                <div id="energia-previsao-container"></div>
-
-                <!-- Second divider and total sum -->
-                <hr class="mt-3" id="energia-total-divider" style="display: none;">
-                <div id="energia-soma-container" class="fw-bold"></div>
-            </div>
-        </div>
-
-        <!-- Modal: Detalhes da Energia -->
-        <div class="modal fade" id="energiaModal" tabindex="-1" aria-labelledby="energiaModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="energiaModalLabel">Cálculo da Energia</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p class="text-muted mb-2" id="energia-contexto"></p>
-                        <div id="energia-steps"></div>
-                        <hr class="my-3">
-                        <div id="energia-resultado" class="fw-bold"></div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 💧 Água -->
-        <div class="card shadow-sm mt-4">
-            <div class="card-body">
-                <h4 class="card-title mb-3">Água</h4>
-                <div class="row g-3">
-                    <div class="col-4">
-                        <label for="agua-ultimo" class="form-label">Último Pagamento</label>
-                        <input type="date" id="agua-ultimo" class="form-control">
-                    </div>
-                    <div class="col-4">
-                        <label for="agua-delivery" class="form-label">Data de Entrega</label>
-                        <input type="text" id="agua-delivery" class="form-control" readonly>
-                    </div>
-                    <div class="col-4">
-                        <label for="agua-valor" class="form-label">Valor da Água (R$)</label>
-                        <input type="number" id="agua-valor" class="form-control" step="any" placeholder="0.00">
-                    </div>
-                </div>
-
-                <div class="row mt-3">
-                    <label for="agua-total" class="form-label fw-bold">Resultado (R$)</label>
-                    <div class="row mt-1 d-flex align-items-end">
-                        <div class="col-2">
-                            <input type="text" id="agua-total" class="form-control" readonly>
-                        </div>
-                        <div class="col-7">
-                            <small id="agua-info" class="text-muted small"></small>
-                        </div>
-                        <div class="col-2">
-                            <button type="button" class="btn btn-outline-primary" id="agua-add-result">Adicionar ao
-                                Final</button>
-                        </div>
-                        <div class="col-1 d-flex align-items-end justify-content-end">
-                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#aguaModal">Ver cálculo</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 🔽 Add item -->
-                <hr class="mt-4">
-                <div class="row g-3 align-items-end">
-                    <div class="col-7">
-                        <label for="agua-desc" class="form-label">Descrição</label>
-                        <input type="text" id="agua-desc" class="form-control" placeholder="Vencimento" value="Vencimento"
-                            required>
-                    </div>
-                    <div class="col-2">
-                        <label for="agua-date" class="form-label">Data de Vencimento</label>
-                        <input type="date" id="agua-date" class="form-control" required>
-                    </div>
-                    <div class="col-2">
-                        <label for="agua-value" class="form-label">Valor (R$)</label>
-                        <input type="number" id="agua-value" class="form-control" step="any" placeholder="0.00"
-                            required>
-                    </div>
-                    <div class="col-1">
-                        <button type="button" class="btn btn-success" id="agua-add-btn">Adicionar</button>
-                    </div>
-                </div>
-
-                <!-- Lista de itens -->
-                <ul class="list-group list-group-flush mt-3" id="agua-list"></ul>
-
-                <!-- Previsão -->
-                <hr class="mt-3" id="agua-divider" style="display: none;">
-                <div id="agua-previsao-container"></div>
-
-                <!-- Total -->
-                <hr class="mt-3" id="agua-total-divider" style="display: none;">
-                <div id="agua-soma-container" class="fw-bold"></div>
-            </div>
-        </div>
-
-        <!-- Modal: Detalhes da Água -->
-        <div class="modal fade" id="aguaModal" tabindex="-1" aria-labelledby="aguaModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="aguaModalLabel">Cálculo da Água</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p class="text-muted mb-2" id="agua-contexto"></p>
-                        <div id="agua-steps"></div>
-                        <hr class="my-3">
-                        <div id="agua-resultado" class="fw-bold"></div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 🏢 Condomínio -->
-        <div class="card shadow-sm my-4">
-            <div class="card-body">
-                <h4 class="card-title mb-3">Condomínio</h4>
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label for="cond-ultimo" class="form-label">Último Pagamento</label>
-                        <input type="date" id="cond-ultimo" class="form-control">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="cond-delivery" class="form-label">Data de Entrega</label>
-                        <input type="text" id="cond-delivery" class="form-control" readonly>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="cond-valor" class="form-label">Valor do Condomínio (R$)</label>
-                        <input type="number" id="cond-valor" class="form-control" step="any" placeholder="0.00">
-                    </div>
-                </div>
-
-                <div class="row mt-3">
-                    <label for="cond-total" class="form-label fw-bold">Resultado (R$)</label>
-                    <div class="row mt-1 d-flex align-items-end">
-                        <div class="col-3">
-                            <input type="text" id="cond-total" class="form-control" readonly>
-                        </div>
-                        <div class="col-6">
-                            <small id="cond-info" class="text-muted small"></small>
-                        </div>
-                        <div class="col-2">
-                            <button type="button" class="btn btn-outline-primary" id="cond-add-result">
-                                Adicionar Resultado
-                            </button>
-                        </div>
-                        <div class="col-1 d-flex align-items-end justify-content-end">
-                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#condModal">Ver cálculo</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 🔽 Add item  -->
-                <hr class="mt-4">
-                <div class="row g-3 align-items-end">
-                    <div class="col-7">
-                        <label for="cond-desc" class="form-label">Descrição</label>
-                        <input type="text" id="cond-desc" class="form-control" placeholder="Vencimento" value="Vencimento"
-                            required>
-                    </div>
-                    <div class="col-2">
-                        <label for="cond-date" class="form-label">Data de Vencimento</label>
-                        <input type="date" id="cond-date" class="form-control" required>
-                    </div>
-                    <div class="col-2">
-                        <label for="cond-value" class="form-label">Valor (R$)</label>
-                        <input type="number" id="cond-value" class="form-control" step="any" placeholder="0.00"
-                            required>
-                    </div>
-                    <div class="col-1">
-                        <button type="button" class="btn btn-success" id="cond-add-btn">Adicionar</button>
-                    </div>
-                </div>
-
-                <!-- Lista -->
-                <ul class="list-group list-group-flush mt-3" id="cond-list"></ul>
-
-                <!-- Previsão -->
-                <hr class="mt-3" id="cond-divider" style="display: none;">
-                <div id="cond-previsao-container"></div>
-
-                <!-- Total -->
-                <hr class="mt-3" id="cond-total-divider" style="display: none;">
-                <div id="cond-soma-container" class="fw-bold"></div>
-            </div>
-        </div>
-
-        <!-- Modal: Detalhes do Condomínio -->
-        <div class="modal fade" id="condModal" tabindex="-1" aria-labelledby="condModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="condModalLabel">Cálculo do Condomínio</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p class="text-muted mb-2" id="cond-contexto"></p>
-                        <div id="cond-steps"></div>
-                        <hr class="my-3">
-                        <div id="cond-resultado" class="fw-bold"></div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card shadow-sm my-4">
-            <div class="card-body">
-                <form id="entryForm" class="row g-3">
-                    <div class="col-7">
-                        <label for="titleExtra" class="form-label">Título</label>
-                        <input type="text" id="title" class="form-control" placeholder="Adicione o Título">
-                    </div>
-                    <div class="col-2">
-                        <label for="date" class="form-label">Data</label>
-                        <input type="date" id="date" class="form-control" required>
-                    </div>
-                    <div class="col-2">
-                        <label for="value" class="form-label">Valor</label>
-                        <input type="number" id="value" class="form-control" step="any" placeholder="Entre o valor"
-                            required>
-                    </div>
-                    <div class="col-1 d-flex align-items-end">
-                        <button type="submit" class="btn btn-success w-100" style="height: 38px;">Add</button>
-                    </div>
-                </form>
             </div>
 
             <div class="card shadow-sm mt-4">
                 <div class="card-body">
-                    <h4>Taxas Extras</h4>
-                    <ul id="entriesList" class="list-group mb-3"></ul>
+                    <div class="d-flex align-items-center gap-2">
+                        <h4 class="card-title mb-3 m-0">IPTU</h4>
+                    </div>
 
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h4>Total: <span id="total">R$ 0,00</span></h4>
-                        <div>
-                            <button class="btn btn-primary me-2" id="refreshBtn">Recalculate</button>
-                            <button class="btn btn-danger" id="clearBtn">Clear All</button>
+                    <!-- IPTU Inputs -->
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="iptu-ultimo" class="form-label">Último Pagamento</label>
+                            <input type="date" id="iptu-ultimo" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="iptu-delivery" class="form-label">Data de Entrega</label>
+                            <input type="text" id="iptu-delivery" class="form-control" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="iptu-value-input" class="form-label">Valor do IPTU (R$)</label>
+                            <input type="number" id="iptu-value-input" class="form-control" step="any"
+                                placeholder="0.00">
+                        </div>
+                    </div>
+
+                    <!-- Resultado -->
+                    <div class="row mt-3">
+                        <label for="iptu-total" class="form-label fw-bold">Resultado (R$)</label>
+                        <div class="row mt-1 d-flex align-items-end">
+                            <div class="col-2">
+                                <input type="text" id="iptu-total" class="form-control" readonly>
+                            </div>
+                            <div class="col-7">
+                                <small id="iptu-info" class="text-muted small"></small>
+                            </div>
+                            <div class="col-2">
+                                <button type="button" class="btn btn-outline-primary" id="iptu-add-result">
+                                    Adicionar ao Final
+                                </button>
+                            </div>
+                            <div class="col-1 d-flex align-items-end justify-content-end">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#iptuModal">Ver cálculo</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 🔽 Add item  -->
+                    <hr class="mt-4">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-7">
+                            <label for="iptu-desc" class="form-label">Descrição</label>
+                            <input type="text" id="iptu-desc" class="form-control" placeholder="Vencimento"
+                                value="Vencimento" required>
+                        </div>
+                        <div class="col-2">
+                            <label for="iptu-date" class="form-label">Data de Vencimento</label>
+                            <input type="date" id="iptu-date" class="form-control" required>
+                        </div>
+                        <div class="col-2">
+                            <label for="iptu-value" class="form-label">Valor (R$)</label>
+                            <input type="number" id="iptu-value" class="form-control" step="any" placeholder="0.00"
+                                required>
+                        </div>
+                        <div class="col-1">
+                            <button type="button" class="btn btn-success" id="iptu-add-btn">Adicionar</button>
+                        </div>
+                    </div>
+
+                    <!-- List of added items -->
+                    <ul class="list-group list-group-flush mt-3" id="iptu-list"></ul>
+
+                    <!-- Divider for previsões -->
+                    <hr class="mt-3" id="iptu-divider" style="display: none;">
+
+                    <!-- Preview item container -->
+                    <div id="iptu-previsao-container"></div>
+
+                    <!-- Second divider and total sum -->
+                    <hr class="mt-3" id="iptu-total-divider" style="display: none;">
+                    <div id="iptu-soma-container" class="fw-bold"></div>
+                </div>
+            </div>
+
+            <!-- Modal: Detalhes do IPTU -->
+            <div class="modal fade" id="iptuModal" tabindex="-1" aria-labelledby="iptuModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="iptuModalLabel">Cálculo do IPTU</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Fechar"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="text-muted mb-2" id="iptu-contexto"></p>
+                            <div id="iptu-steps"></div>
+                            <hr class="my-3">
+                            <div id="iptu-resultado" class="fw-bold"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="d-flex justify-content-center mt-4 gap-2">
-            <button id="generatePDF" class="btn btn-primary">Gerar PDF</button>
-            <button id="clearAll" class="btn btn-outline-danger">Limpar Tudo</button>
-        </div>
 
-        <!-- ✅ Toast container -->
-        <div id="toast" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
-            <div id="toast-message" class="toast align-items-center text-bg-success border-0" role="alert"
-                aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <!-- Message will be injected here -->
+
+            <!-- ⚡ Energia -->
+            <div class="card shadow-sm mt-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center gap-2">
+                        <h4 class="card-title mb-3 m-0">Energia</h4>
                     </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-                        aria-label="Close"></button>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="energia-ultimo" class="form-label">Último Pagamento</label>
+                            <input type="date" id="energia-ultimo" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="energia-delivery" class="form-label">Data de Entrega</label>
+                            <input type="text" id="energia-delivery" class="form-control" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="energia-valor" class="form-label">Valor da Energia (R$)</label>
+                            <input type="number" id="energia-valor" class="form-control" step="any" placeholder="0.00">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <label for="energia-total" class="form-label fw-bold">Resultado (R$)</label>
+                        <div class="row mt-1 d-flex align-items-end">
+                            <div class="col-3">
+                                <input type="text" id="energia-total" class="form-control" readonly>
+                            </div>
+                            <div class="col-6">
+                                <small id="energia-info" class="text-muted small"></small>
+                            </div>
+                            <div class="col-2">
+                                <button type="button" class="btn btn-outline-primary" id="energia-add-result">
+                                    Adicionar ao Final
+                                </button>
+                            </div>
+                            <div class="col-1 d-flex align-items-end justify-content-end">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#energiaModal">Ver cálculo</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 🔽 Add item  -->
+                    <hr class="mt-4">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-7">
+                            <label for="energia-desc" class="form-label">Descrição</label>
+                            <input type="text" id="energia-desc" class="form-control" placeholder="Vencimento"
+                                value="Vencimento" required>
+                        </div>
+                        <div class="col-2">
+                            <label for="energia-date" class="form-label">Data de Vencimento</label>
+                            <input type="date" id="energia-date" class="form-control" required>
+                        </div>
+                        <div class="col-2">
+                            <label for="energia-value" class="form-label">Valor (R$)</label>
+                            <input type="number" id="energia-value" class="form-control" step="any" placeholder="0.00"
+                                required>
+                        </div>
+                        <div class="col-1">
+                            <button type="button" class="btn btn-success" id="energia-add-btn">Adicionar</button>
+                        </div>
+                    </div>
+
+                    <!-- List of added items -->
+                    <ul class="list-group list-group-flush mt-3" id="energia-list"></ul>
+
+                    <!-- Divider for previsões -->
+                    <hr class="mt-3" id="energia-divider" style="display: none;">
+
+                    <!-- Preview item container -->
+                    <div id="energia-previsao-container"></div>
+
+                    <!-- Second divider and total sum -->
+                    <hr class="mt-3" id="energia-total-divider" style="display: none;">
+                    <div id="energia-soma-container" class="fw-bold"></div>
                 </div>
             </div>
-        </div>
 
-        <button onclick="topFunction()" id="myBtnUp" title="Go to top">Topo</button>
-        <button onclick="bottomFunction()" id="myBtnDown" title="Go to bottom">Final</button>
+            <!-- Modal: Detalhes da Energia -->
+            <div class="modal fade" id="energiaModal" tabindex="-1" aria-labelledby="energiaModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="energiaModalLabel">Cálculo da Energia</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Fechar"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="text-muted mb-2" id="energia-contexto"></p>
+                            <div id="energia-steps"></div>
+                            <hr class="my-3">
+                            <div id="energia-resultado" class="fw-bold"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <script src="{{ url_for('static', filename='acertoDias.js') }}"></script>
-        <script src="{{ url_for('static', filename='agua.js') }}"></script>
-        <script src="{{ url_for('static', filename='condominio.js') }}"></script>
-        <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
-        <script src="{{ url_for('static', filename='energia.js') }}"></script>
-        <script src="{{ url_for('static', filename='iptu.js') }}"></script>
-        <script src="{{ url_for('static', filename='multa.js') }}"></script>
-        <script src="{{ url_for('static', filename='restoreData.js') }}"></script>
-        <script src="{{ url_for('static', filename='saveData.js') }}"></script>
-        <script src="{{ url_for('static', filename='taxasExtras.js') }}"></script>
-        <script>
-            window.MathJax = {
-                tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-                svg: { fontCache: 'global' }
-            };
-        </script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+            <!-- 💧 Água -->
+            <div class="card shadow-sm mt-4">
+                <div class="card-body">
+                    <h4 class="card-title mb-3">Água</h4>
+                    <div class="row g-3">
+                        <div class="col-4">
+                            <label for="agua-ultimo" class="form-label">Último Pagamento</label>
+                            <input type="date" id="agua-ultimo" class="form-control">
+                        </div>
+                        <div class="col-4">
+                            <label for="agua-delivery" class="form-label">Data de Entrega</label>
+                            <input type="text" id="agua-delivery" class="form-control" readonly>
+                        </div>
+                        <div class="col-4">
+                            <label for="agua-valor" class="form-label">Valor da Água (R$)</label>
+                            <input type="number" id="agua-valor" class="form-control" step="any" placeholder="0.00">
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <label for="agua-total" class="form-label fw-bold">Resultado (R$)</label>
+                        <div class="row mt-1 d-flex align-items-end">
+                            <div class="col-2">
+                                <input type="text" id="agua-total" class="form-control" readonly>
+                            </div>
+                            <div class="col-7">
+                                <small id="agua-info" class="text-muted small"></small>
+                            </div>
+                            <div class="col-2">
+                                <button type="button" class="btn btn-outline-primary" id="agua-add-result">Adicionar ao
+                                    Final</button>
+                            </div>
+                            <div class="col-1 d-flex align-items-end justify-content-end">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#aguaModal">Ver cálculo</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 🔽 Add item -->
+                    <hr class="mt-4">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-7">
+                            <label for="agua-desc" class="form-label">Descrição</label>
+                            <input type="text" id="agua-desc" class="form-control" placeholder="Vencimento"
+                                value="Vencimento" required>
+                        </div>
+                        <div class="col-2">
+                            <label for="agua-date" class="form-label">Data de Vencimento</label>
+                            <input type="date" id="agua-date" class="form-control" required>
+                        </div>
+                        <div class="col-2">
+                            <label for="agua-value" class="form-label">Valor (R$)</label>
+                            <input type="number" id="agua-value" class="form-control" step="any" placeholder="0.00"
+                                required>
+                        </div>
+                        <div class="col-1">
+                            <button type="button" class="btn btn-success" id="agua-add-btn">Adicionar</button>
+                        </div>
+                    </div>
+
+                    <!-- Lista de itens -->
+                    <ul class="list-group list-group-flush mt-3" id="agua-list"></ul>
+
+                    <!-- Previsão -->
+                    <hr class="mt-3" id="agua-divider" style="display: none;">
+                    <div id="agua-previsao-container"></div>
+
+                    <!-- Total -->
+                    <hr class="mt-3" id="agua-total-divider" style="display: none;">
+                    <div id="agua-soma-container" class="fw-bold"></div>
+                </div>
+            </div>
+
+            <!-- Modal: Detalhes da Água -->
+            <div class="modal fade" id="aguaModal" tabindex="-1" aria-labelledby="aguaModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="aguaModalLabel">Cálculo da Água</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Fechar"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="text-muted mb-2" id="agua-contexto"></p>
+                            <div id="agua-steps"></div>
+                            <hr class="my-3">
+                            <div id="agua-resultado" class="fw-bold"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🏢 Condomínio -->
+            <div class="card shadow-sm my-4">
+                <div class="card-body">
+                    <h4 class="card-title mb-3">Condomínio</h4>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="cond-ultimo" class="form-label">Último Pagamento</label>
+                            <input type="date" id="cond-ultimo" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="cond-delivery" class="form-label">Data de Entrega</label>
+                            <input type="text" id="cond-delivery" class="form-control" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="cond-valor" class="form-label">Valor do Condomínio (R$)</label>
+                            <input type="number" id="cond-valor" class="form-control" step="any" placeholder="0.00">
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <label for="cond-total" class="form-label fw-bold">Resultado (R$)</label>
+                        <div class="row mt-1 d-flex align-items-end">
+                            <div class="col-3">
+                                <input type="text" id="cond-total" class="form-control" readonly>
+                            </div>
+                            <div class="col-6">
+                                <small id="cond-info" class="text-muted small"></small>
+                            </div>
+                            <div class="col-2">
+                                <button type="button" class="btn btn-outline-primary" id="cond-add-result">
+                                    Adicionar Resultado
+                                </button>
+                            </div>
+                            <div class="col-1 d-flex align-items-end justify-content-end">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#condModal">Ver cálculo</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 🔽 Add item  -->
+                    <hr class="mt-4">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-7">
+                            <label for="cond-desc" class="form-label">Descrição</label>
+                            <input type="text" id="cond-desc" class="form-control" placeholder="Vencimento"
+                                value="Vencimento" required>
+                        </div>
+                        <div class="col-2">
+                            <label for="cond-date" class="form-label">Data de Vencimento</label>
+                            <input type="date" id="cond-date" class="form-control" required>
+                        </div>
+                        <div class="col-2">
+                            <label for="cond-value" class="form-label">Valor (R$)</label>
+                            <input type="number" id="cond-value" class="form-control" step="any" placeholder="0.00"
+                                required>
+                        </div>
+                        <div class="col-1">
+                            <button type="button" class="btn btn-success" id="cond-add-btn">Adicionar</button>
+                        </div>
+                    </div>
+
+                    <!-- Lista -->
+                    <ul class="list-group list-group-flush mt-3" id="cond-list"></ul>
+
+                    <!-- Previsão -->
+                    <hr class="mt-3" id="cond-divider" style="display: none;">
+                    <div id="cond-previsao-container"></div>
+
+                    <!-- Total -->
+                    <hr class="mt-3" id="cond-total-divider" style="display: none;">
+                    <div id="cond-soma-container" class="fw-bold"></div>
+                </div>
+            </div>
+
+            <!-- Modal: Detalhes do Condomínio -->
+            <div class="modal fade" id="condModal" tabindex="-1" aria-labelledby="condModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="condModalLabel">Cálculo do Condomínio</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Fechar"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="text-muted mb-2" id="cond-contexto"></p>
+                            <div id="cond-steps"></div>
+                            <hr class="my-3">
+                            <div id="cond-resultado" class="fw-bold"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm my-4">
+                <div class="card-body">
+                    <form id="entryForm" class="row g-3">
+                        <div class="col-7">
+                            <label for="titleExtra" class="form-label">Título</label>
+                            <input type="text" id="title" class="form-control" placeholder="Adicione o Título">
+                        </div>
+                        <div class="col-2">
+                            <label for="date" class="form-label">Data</label>
+                            <input type="date" id="date" class="form-control" required>
+                        </div>
+                        <div class="col-2">
+                            <label for="value" class="form-label">Valor</label>
+                            <input type="number" id="value" class="form-control" step="any" placeholder="Entre o valor"
+                                required>
+                        </div>
+                        <div class="col-1 d-flex align-items-end">
+                            <button type="submit" class="btn btn-success w-100" style="height: 38px;">Add</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card shadow-sm mt-4">
+                    <div class="card-body">
+                        <h4>Taxas Extras</h4>
+                        <ul id="entriesList" class="list-group mb-3"></ul>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4>Total: <span id="total">R$ 0,00</span></h4>
+                            <div>
+                                <button class="btn btn-primary me-2" id="refreshBtn">Recalculate</button>
+                                <button class="btn btn-danger" id="clearBtn">Clear All</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center mt-4 gap-2">
+                <button id="generatePDF" class="btn btn-primary">Gerar PDF</button>
+                <button id="clearAll" class="btn btn-outline-danger">Limpar Tudo</button>
+            </div>
+
+            <!-- ✅ Toast container -->
+            <div id="toast" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
+                <div id="toast-message" class="toast align-items-center text-bg-success border-0" role="alert"
+                    aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <!-- Message will be injected here -->
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                            aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="topFunction()" id="myBtnUp" title="Go to top">Topo</button>
+            <button onclick="bottomFunction()" id="myBtnDown" title="Go to bottom">Final</button>
+
+            <script src="{{ url_for('static', filename='acertoDias.js') }}"></script>
+            <script src="{{ url_for('static', filename='agua.js') }}"></script>
+            <script src="{{ url_for('static', filename='condominio.js') }}"></script>
+            <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+            <script src="{{ url_for('static', filename='energia.js') }}"></script>
+            <script src="{{ url_for('static', filename='iptu.js') }}"></script>
+            <script src="{{ url_for('static', filename='multa.js') }}"></script>
+            <script src="{{ url_for('static', filename='restoreData.js') }}"></script>
+            <script src="{{ url_for('static', filename='saveData.js') }}"></script>
+            <script src="{{ url_for('static', filename='taxasExtras.js') }}"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+            <script>
+                window.MathJax = {
+                    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+                    svg: { fontCache: 'global' }
+                };
+            </script>
+        </div> <!-- Close main-content -->
 </body>
 
 </html>

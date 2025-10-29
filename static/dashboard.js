@@ -25,7 +25,7 @@ function formatDateBR(dateStr) {
 // Attach listeners
 [
   "delivery-date", "final-notice",
-  "iptu-ultimo","iptu-valor",
+  "iptu-ultimo", "iptu-valor",
   "energia-ultimo", "energia-valor",
   "agua-ultimo", "agua-valor",
   "cond-ultimo", "cond-valor"
@@ -103,3 +103,43 @@ function topFunction() {
 function bottomFunction() {
   window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+  const sidebar = document.getElementById('sidebar');
+  const collapseBtn = document.getElementById('collapseBtn');
+  const mainContent = document.getElementById('mainContent');
+
+  collapseBtn.addEventListener('click', function () {
+    sidebar.classList.toggle('collapsed');
+  });
+
+  // Close sidebar on mobile when clicking outside
+  document.addEventListener('click', function (e) {
+    if (window.innerWidth <= 768) {
+      if (!sidebar.contains(e.target) && !sidebar.classList.contains('collapsed')) {
+        sidebar.classList.add('collapsed');
+      }
+    }
+  });
+});
+
+// Sidebar JavaScript (external toggle tab only)
+document.addEventListener('DOMContentLoaded', function () {
+    const sidebar = document.getElementById('sidebar');
+    const tabBtn = document.getElementById('sidebarToggleTab');
+
+    function setIcon() {
+        const isCollapsed = sidebar.classList.contains('collapsed');
+        const dirIcon = isCollapsed ? 'fa-angle-right' : 'fa-angle-left';
+        const tabI = tabBtn.querySelector('i');
+        tabI.className = 'fas ' + dirIcon;
+    }
+
+    function toggleSidebar() {
+        sidebar.classList.toggle('collapsed');
+        setIcon();
+    }
+
+    tabBtn.addEventListener('click', toggleSidebar);
+    setIcon(); // Initialize icon on load
+});

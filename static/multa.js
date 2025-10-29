@@ -286,9 +286,5 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Atualiza uma vez na carga (se já houver dados preenchidos/restaurados)
-  // Atualiza uma vez na carga (se já houver dados preenchidos/restaurados)
   updateMultaModal();
-  });
-
-  // Atualiza uma vez na carga (se já houver dados preenchidos/restaurados)
-  updateMultaModal();
+});
