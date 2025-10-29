@@ -68,7 +68,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 280px;
+  width: 220px;
   height: 100vh;
   background-color: white;
   color: white;
@@ -86,7 +86,7 @@
 .sidebar-toggle-tab {
   position: fixed;
   top: 15px;
-  left: 280px; /* aligns to sidebar edge when expanded */
+  left: 220px; /* aligns to sidebar edge when expanded */
   width: 34px;
   height: 34px;
   display: inline-flex;
@@ -149,7 +149,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 20px 5px;
   border-bottom: 1px solid #404040;
 }
 
