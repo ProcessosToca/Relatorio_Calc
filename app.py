@@ -4,7 +4,7 @@ app = Flask(__name__)
 app.secret_key = "supersecretkey"
 
 USERNAME = "TocaImoveis"
-PASSWORD = "Toca@2025"
+PASSWORD = "Toca@2025@"
 
 entries = []
 next_id = 1
