@@ -30,7 +30,30 @@ document.addEventListener("DOMContentLoaded", () => {
       "Multa Contratual",
       `
       ${infoHTML}
-      ${data.multa.valor ? `<strong>${data.multa.valor}</strong>` : ""}
+      `
+    );
+  }
+
+    // ===== Acerto de Dias =====
+  if (data.acerto && (data.acerto.valor || data.acerto.info)) {
+    let infoHTML = "";
+    if (data.acerto.info) {
+      let infoArray = [];
+      if (Array.isArray(data.acerto.info)) {
+        infoArray = data.acerto.info;
+      } else if (typeof data.acerto.info === "string") {
+        infoArray = data.acerto.info
+          .split(/\n+|\s*-\s*/g)
+          .map(s => s.trim())
+          .filter(Boolean);
+      }
+      infoHTML = `<p>${infoArray.map(line => `- ${line}<br>`).join('')}</p>`;
+    }
+
+    addSection(
+      "Acerto de dias",
+      `
+      ${infoHTML}
       `
     );
   }
@@ -60,31 +83,6 @@ document.addEventListener("DOMContentLoaded", () => {
       ${previsaoHTML}
       ${data.iptu.total ? `<strong>${data.iptu.total}</strong>` : ""}
       `
-    );
-  }
-
-  // ===== Acerto de Dias =====
-  if (data.acerto && (data.acerto.valor || data.acerto.info)) {
-    let infoHTML = "";
-    if (data.acerto.info) {
-      let infoArray = [];
-      if (Array.isArray(data.acerto.info)) {
-        infoArray = data.acerto.info;
-      } else if (typeof data.acerto.info === "string") {
-        infoArray = data.acerto.info
-          .split(/\n+|\s*-\s*/g)
-          .map(s => s.trim())
-          .filter(Boolean);
-      }
-      infoHTML = `<p>${infoArray.map(line => `- ${line}<br>`).join('')}</p>`;
-    }
-
-    addSection(
-      "Acerto de dias",
-      `
-    ${infoHTML}
-    ${data.acerto.valor ? `<strong>${data.acerto.valor}</strong>` : ""}
-    `
     );
   }
 
@@ -187,8 +185,8 @@ document.addEventListener("DOMContentLoaded", () => {
       "Taxas Extras",
       `
     ${items ? `<ul>${items}</ul>` : ""}
-    ${data.taxas.total ? `<strong>${data.taxas.total}</strong>` : ""}
     `
+    // <strong>Soma total:</strong> ${data.taxas.total ? `<strong>${data.taxas.total}</strong>` : ""}
     );
   }
 

@@ -13,8 +13,12 @@ function calculateCondominio() {
   }
 
   if (ultimo === delivery) {
-    resultField.value = "R$ 0,00";
-    info.textContent = "Sem diferença de dias.";
+    // Quando as datas são iguais, conta 1 dia (incluindo o dia inicial)
+    const daily = valor / 30;
+    const total = daily * 1;
+    const valorFormatado = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    resultField.value = valorFormatado;
+    info.textContent = `Previsão referente a 1 dia de condomínio (Período ${formatDateBR(ultimo)}). ${valorFormatado}`;
     return;
   }
 
@@ -22,10 +26,11 @@ function calculateCondominio() {
   const daily = valor / 30;
   const total = daily * diffDays;
 
-  resultField.value = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  const valorFormatado = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  resultField.value = valorFormatado;
   info.textContent = `Previsão referente a ${diffDays.toFixed(0)} dia(s) de condomínio (Período ${formatDateBR(
     ultimo
-  )} à ${formatDateBR(delivery)}).`;
+  )} à ${formatDateBR(delivery)}). ${valorFormatado}`;
 }
 
 function formatDateBR(dateStr) {
@@ -36,6 +41,17 @@ function formatDateBR(dateStr) {
   const mm = String(d.getMonth() + 1).padStart(2, "0");
   const yyyy = d.getFullYear();
   return `${dd}/${mm}/${yyyy}`;
+}
+
+// Helper para calcular diferença de dias - inclui o dia inicial
+function getDaysDiff(date1, date2) {
+  if (!date1 || !date2) return 0;
+  const d1 = new Date(date1);
+  const d2 = new Date(date2);
+  if (isNaN(d1) || isNaN(d2)) return 0;
+  const diffMs = d2 - d1;
+  // Inclui o dia inicial no cálculo
+  return Math.abs(Math.ceil(diffMs / (1000 * 60 * 60 * 24))) + 1;
 }
 
 // Manual items, previsão and soma follow the same pattern as agua
@@ -117,7 +133,7 @@ function setupAddResultCondominio() {
 
     box.insertAdjacentHTML(
       "beforeend",
-      `<p class="text-muted mb-1">- ${text} <b style="color: red;">${num.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</b><br></p>`
+      `<p class="text-muted mb-1">- ${text}<br></p>`
     );
 
     calculateTotalCondominio();

@@ -21,7 +21,8 @@ function getDaysDiff(isoStart, isoEnd) {
   const d2 = new Date(isoEnd);
   if (isNaN(d1) || isNaN(d2)) return 0;
   const diffMs = d2 - d1;
-  return Math.abs(Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+  // Inclui o dia inicial no cálculo
+  return Math.abs(Math.ceil(diffMs / (1000 * 60 * 60 * 24))) + 1;
 }
 
 // ---- Calc ----
@@ -44,8 +45,11 @@ function calculateIptu() {
   }
 
   if (ultimoISO === deliveryISO) {
-    resultField.value = "R$ 0,00";
-    info.textContent  = "Sem diferença de dias.";
+    // Quando as datas são iguais, conta 1 dia (incluindo o dia inicial)
+    const daily = valor / 30;
+    const total = daily * 1;
+    resultField.value = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    info.textContent = `Previsão referente a 1 dia de IPTU (Período ${formatDateBR(ultimoISO)}). ${resultField.value}`;
     return;
   }
 
@@ -53,8 +57,9 @@ function calculateIptu() {
   const daily    = valor / 30;
   const total    = daily * diffDays;
 
-  resultField.value = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-  info.textContent  = `Previsão referente a ${diffDays} dia(s) de IPTU (Período ${formatDateBR(ultimoISO)} à ${formatDateBR(deliveryISO)}).`;
+  const valorFormatado = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  resultField.value = valorFormatado;
+  info.textContent  = `Previsão referente a ${diffDays} dia(s) de IPTU (Período ${formatDateBR(ultimoISO)} à ${formatDateBR(deliveryISO)}). ${valorFormatado}`;
 }
 
 // ---- Add manual items to list ----
@@ -100,7 +105,7 @@ function setupAddLineIptu() {
     list.appendChild(li);
 
     count++;
-    descInput.value = "";
+    descInput.value = "Vencimento";
     dateInput.value = "";
     valueInput.value = "";
     addBtn.disabled = true;
@@ -143,7 +148,7 @@ function setupAddResultIptu() {
     // append one line, keep each on its own line
     box.insertAdjacentHTML(
       "beforeend",
-      `<p class="text-muted mb-1">- ${text} <b style="color: red;">${num.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</b><br></p>`
+      `<p class="text-muted mb-1">- ${text}<br></p>`
     );
 
     calculateTotalIptu();

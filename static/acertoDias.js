@@ -47,7 +47,7 @@ function calculateAcertoDias() {
   // If both are equal, there's no difference
   if (deliveryDate.getTime() === noticeDate.getTime()) {
     resultField.value = "R$ 0,00";
-    info.textContent = "Sem diferença de dias entre a entrega e o aviso.";
+    info.textContent = `Sem diferença de dias entre a entrega e o aviso. ${resultField.value}`;
     return;
   }
 
@@ -64,28 +64,31 @@ function calculateAcertoDias() {
   let diffDays = 0;
 
   if (yesSelected) {
-    // ✅ YES: original calculation (absolute difference)
-    diffDays = Math.abs((deliveryDate - ultimoDate) / (1000 * 60 * 60 * 24));
+    // ✅ YES: original calculation (absolute difference) - inclui o dia inicial
+    diffDays = Math.abs((deliveryDate - ultimoDate) / (1000 * 60 * 60 * 24)) + 1;
     total = dailyVal * diffDays;
 
-    resultField.value = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-    info.textContent = `Referente ao acerto de ${diffDays.toFixed(0)} dia(s) de aluguel × R$ ${dailyVal.toFixed(2)} por dia (período ${ultimoFormatted} à ${deliveryFormatted}).`;
+    const valorFormatado = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    resultField.value = valorFormatado;
+    info.textContent = `Referente ao acerto de ${diffDays.toFixed(0)} dia(s) de aluguel × R$ ${dailyVal.toFixed(2)} por dia (período ${ultimoFormatted} à ${deliveryFormatted}). ${valorFormatado}`;
 
   } else if (noSelected) {
-    // ✅ NO: special rule — if deliveryDate > noticeDate
+    // ✅ NO: special rule — if deliveryDate > noticeDate - inclui o dia inicial
     if (deliveryDate > noticeDate) {
-      diffDays = (deliveryDate - ultimoDate) / (1000 * 60 * 60 * 24);
+      diffDays = Math.floor((deliveryDate - ultimoDate) / (1000 * 60 * 60 * 24)) + 1;
       total = dailyVal * diffDays;
 
-      resultField.value = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-      info.textContent = `Previsão referente a ${diffDays.toFixed(0)} dia(s) de aluguel × R$ ${dailyVal.toFixed(2)} (Período de ${ultimoFormatted} até ${deliveryFormatted}).`;
+      const valorFormatado = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+      resultField.value = valorFormatado;
+      info.textContent = `Previsão referente a ${diffDays.toFixed(0)} dia(s) de aluguel × R$ ${dailyVal.toFixed(2)} (Período de ${ultimoFormatted} até ${deliveryFormatted}). ${valorFormatado}`;
     } else if (noticeDate > deliveryDate) {
       // You said you'll implement another calc here later
-      diffDays = (noticeDate - ultimoDate) / (1000 * 60 * 60 * 24);
+      diffDays = Math.floor((noticeDate - ultimoDate) / (1000 * 60 * 60 * 24)) + 1;
       total = dailyVal * diffDays;
 
-      resultField.value = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-      info.textContent = `Previsão referente a ${diffDays.toFixed(0)} dia(s) de aluguel × R$ ${dailyVal.toFixed(2)} (Período de ${ultimoFormatted} até ${noticeFormatted}).`;
+      const valorFormatado = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+      resultField.value = valorFormatado;
+      info.textContent = `Previsão referente a ${diffDays.toFixed(0)} dia(s) de aluguel × R$ ${dailyVal.toFixed(2)} (Período de ${ultimoFormatted} até ${noticeFormatted}). ${valorFormatado}`;
     }
   }
 }
@@ -103,12 +106,12 @@ document.getElementById("noOption").addEventListener("change", () => {
   calculateAcertoDias();
 });
 
-// 🔁 Shared helper
+// 🔁 Shared helper - inclui o dia inicial
 function getDaysDiff(date1, date2) {
   if (!date1 || !date2) return 0;
   const d1 = new Date(date1);
   const d2 = new Date(date2);
-  return Math.abs((d1 - d2) / (1000 * 60 * 60 * 24));
+  return Math.abs((d1 - d2) / (1000 * 60 * 60 * 24)) + 1;
 }
 
 function updateSharedDates() {
@@ -168,16 +171,16 @@ function updateAcertoModal() {
   let regra = "";
 
   if (yesSelected) {
-    diffDays = Math.abs((deliveryDate - ultimoDate) / (1000 * 60 * 60 * 24));
+    diffDays = Math.abs((deliveryDate - ultimoDate) / (1000 * 60 * 60 * 24)) + 1;
     total = dailyVal * diffDays;
     regra = "Com multa: dias até a entrega + multa contratual (a multa é somada em outra seção).";
   } else if (noSelected) {
     if (deliveryDate > noticeDate) {
-      diffDays = (deliveryDate - ultimoDate) / (1000 * 60 * 60 * 24);
+      diffDays = Math.floor((deliveryDate - ultimoDate) / (1000 * 60 * 60 * 24)) + 1;
       total = dailyVal * diffDays;
       regra = "Sem multa: cobrar até a data da entrega das chaves.";
     } else {
-      diffDays = (noticeDate - ultimoDate) / (1000 * 60 * 60 * 24);
+      diffDays = Math.floor((noticeDate - ultimoDate) / (1000 * 60 * 60 * 24)) + 1;
       total = dailyVal * diffDays;
       regra = "Sem multa: cobrar até o final do aviso.";
     }

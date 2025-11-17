@@ -153,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ---------- Acerto de Dias ----------
     if (data.acerto) {
         setText("acerto-info", data.acerto.info);
-        setVal("acerto-total", data.acerto.valor);
+        setVal("acerto-dias", data.acerto.valor);
         if (data.acerto.inputs) {
             setVal("acertoDias-ultimo-display", data.acerto.inputs.lastRent);
             setVal("final-notice-display", data.acerto.inputs.noticeDate);

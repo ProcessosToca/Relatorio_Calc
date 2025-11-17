@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ---------- Acerto de Dias ----------
     (() => {
-      const valor = document.getElementById("acerto-total")?.value || "";
+      const valor = document.getElementById("acerto-dias")?.value || "";
       const info = document.getElementById("acerto-info")?.textContent || "";
       const hasMoney = parseBR(valor) > 0;
 

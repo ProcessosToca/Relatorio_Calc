@@ -69,12 +69,13 @@ function mirrorMultaInputs() {
 // 🚀 Run once when page loads
 document.addEventListener("DOMContentLoaded", mirrorMultaInputs);
 
-// ✅ Get difference in months between two dates
+// ✅ Get difference in months between two dates - inclui o dia inicial
 function getMonthsAndDaysDiff(date1, date2) {
   const d1 = new Date(date1);
   const d2 = new Date(date2);
   const diffMs = Math.abs(d1 - d2);
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  // Inclui o dia inicial no cálculo
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1;
   const months = Math.floor(diffDays / 30);
   const remainingDays = diffDays % 30;
   return { months, remainingDays };
@@ -131,7 +132,7 @@ function calculateMultaContratual() {
   const finishDateFormatted = formatDateBR(finishDateStr);
   const deliveryDateFormatted = formatDateBR(deliveryISO);
 
-  infoField.textContent = `Previsão referente ao acerto dias sendo ${totalDays} dia(s) de aluguel (período ${finishDateFormatted} à ${deliveryDateFormatted}). ${resultField.value}`;
+  infoField.textContent = `Previsão referente ao acerto dias sendo ${totalDays} dia(s) de aluguel (período ${deliveryDateFormatted} à ${finishDateFormatted}). ${resultField.value}`;
 }
 
 
