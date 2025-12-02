@@ -70,7 +70,7 @@ function calculateAcertoDias() {
 
     const valorFormatado = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
     resultField.value = valorFormatado;
-    info.textContent = `Referente ao acerto de ${diffDays.toFixed(0)} dia(s) de aluguel × R$ ${dailyVal.toFixed(2)} por dia (período ${ultimoFormatted} à ${deliveryFormatted}). ${valorFormatado}`;
+    info.textContent = `Referente ao acerto de ${diffDays.toFixed(0)} dia(s) de aluguel (período ${ultimoFormatted} à ${deliveryFormatted}). ${valorFormatado}`;
 
   } else if (noSelected) {
     // ✅ NO: special rule — if deliveryDate > noticeDate - inclui o dia inicial
@@ -80,7 +80,7 @@ function calculateAcertoDias() {
 
       const valorFormatado = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
       resultField.value = valorFormatado;
-      info.textContent = `Previsão referente a ${diffDays.toFixed(0)} dia(s) de aluguel × R$ ${dailyVal.toFixed(2)} (Período de ${ultimoFormatted} até ${deliveryFormatted}). ${valorFormatado}`;
+      info.textContent = `Referente a ${diffDays.toFixed(0)} dia(s) de aluguel(Período de ${ultimoFormatted} até ${deliveryFormatted}). ${valorFormatado}`;
     } else if (noticeDate > deliveryDate) {
       // You said you'll implement another calc here later
       diffDays = Math.floor((noticeDate - ultimoDate) / (1000 * 60 * 60 * 24)) + 1;
@@ -88,7 +88,7 @@ function calculateAcertoDias() {
 
       const valorFormatado = total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
       resultField.value = valorFormatado;
-      info.textContent = `Previsão referente a ${diffDays.toFixed(0)} dia(s) de aluguel × R$ ${dailyVal.toFixed(2)} (Período de ${ultimoFormatted} até ${noticeFormatted}). ${valorFormatado}`;
+      info.textContent = `Referente a ${diffDays.toFixed(0)} dia(s) de aluguel (Período de ${ultimoFormatted} até ${noticeFormatted}). ${valorFormatado}`;
     }
   }
 }

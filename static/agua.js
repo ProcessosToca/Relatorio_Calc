@@ -94,7 +94,7 @@ function setupAddLineAgua() {
 
     list.appendChild(li);
     count++;
-    descInput.value = "";
+    descInput.value = "Vencimento";
     dateInput.value = "";
     valueInput.value = "";
     addBtn.disabled = true;
