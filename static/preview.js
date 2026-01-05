@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const items = (data.iptu.list || []).map(i => `<li>${i}</li>`).join("");
 
     let previsaoHTML = "";
-    if (data.iptu.previsao) {
+    if (data.iptu.previsao && data.iptu.previsao.length > 0) {
       let previsaoArray = [];
       if (Array.isArray(data.iptu.previsao)) {
         previsaoArray = data.iptu.previsao;
@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
           .map(s => s.trim())
           .filter(Boolean);
       }
-      previsaoHTML = `<p>${previsaoArray.map(line => `- ${line}<br>`).join('')}</p>`;
+      previsaoHTML = previsaoArray.length > 0 ? `<ul>${previsaoArray.map(line => `<li>${line}</li>`).join('')}</ul>` : "";
     }
 
     addSection(
@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const items = (data.energia.list || []).map(i => `<li>${i}</li>`).join("");
 
     let previsaoHTML = "";
-    if (data.energia.previsao) {
+    if (data.energia.previsao && data.energia.previsao.length > 0) {
       let previsaoArray = [];
 
       if (Array.isArray(data.energia.previsao)) {
@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
           .filter(Boolean);
       }
 
-      previsaoHTML = `<p>${previsaoArray.map(line => `- ${line}<br>`).join('')}</p>`;
+      previsaoHTML = previsaoArray.length > 0 ? `<ul>${previsaoArray.map(line => `<li>${line}</li>`).join('')}</ul>` : "";
     }
 
     addSection(
@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const items = (data.agua.list || []).map(i => `<li>${i}</li>`).join("");
 
     let previsaoHTML = "";
-    if (data.agua.previsao) {
+    if (data.agua.previsao && data.agua.previsao.length > 0) {
       let previsaoArray = [];
 
       if (Array.isArray(data.agua.previsao)) {
@@ -134,7 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
           .filter(Boolean);
       }
 
-      previsaoHTML = `<p>${previsaoArray.map(line => `- ${line}<br>`).join('')}</p>`;
+      previsaoHTML = previsaoArray.length > 0 ? `<ul>${previsaoArray.map(line => `<li>${line}</li>`).join('')}</ul>` : "";
     }
 
     addSection(
@@ -153,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const items = (data.condominio.list || []).map(i => `<li>${i}</li>`).join("");
 
     let previsaoHTML = "";
-    if (data.condominio.previsao) {
+    if (data.condominio.previsao && data.condominio.previsao.length > 0) {
       let previsaoArray = [];
 
       if (Array.isArray(data.condominio.previsao)) {
@@ -165,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
           .filter(Boolean);
       }
 
-      previsaoHTML = `<p>${previsaoArray.map(line => `- ${line}<br>`).join('')}</p>`;
+      previsaoHTML = previsaoArray.length > 0 ? `<ul>${previsaoArray.map(line => `<li>${line}</li>`).join('')}</ul>` : "";
     }
 
     addSection(

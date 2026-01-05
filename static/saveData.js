@@ -69,10 +69,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // ---------- IPTU ----------
     (() => {
       const list = Array.from(document.querySelectorAll("#iptu-list li span")).map(el => el.textContent);
-      const previsao = document.getElementById("iptu-previsao-container")?.innerText.trim("<br />") || "";
-      const total = document.getElementById("iptu-soma-container")?.textContent.trim("<br />") || "";
+      const previsao = Array.from(document.querySelectorAll("#iptu-previsao-container li span")).map(el => el.textContent);
+      const total = document.getElementById("iptu-soma-container")?.textContent.trim() || "";
 
-      if (list.length > 0 || previsao) {
+      if (list.length > 0 || previsao.length > 0) {
         data.iptu = {
           list,
           previsao,
@@ -92,9 +92,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // ---------- Energia ----------
     (() => {
       const list = Array.from(document.querySelectorAll("#energia-list li span")).map(el => el.textContent);
-      const previsao = document.getElementById("energia-previsao-container")?.innerText.trim("<br />") || "";
-      const total = document.getElementById("energia-soma-container")?.textContent.trim("<br />") || "";
-      if (list.length > 0 || previsao) {
+      const previsao = Array.from(document.querySelectorAll("#energia-previsao-container li span")).map(el => el.textContent);
+      const total = document.getElementById("energia-soma-container")?.textContent.trim() || "";
+      if (list.length > 0 || previsao.length > 0) {
         data.energia = {
           list, previsao, total,
           inputs: {
@@ -111,9 +111,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // ---------- Água ----------
     (() => {
       const list = Array.from(document.querySelectorAll("#agua-list li span")).map(el => el.textContent);
-      const previsao = document.getElementById("agua-previsao-container")?.innerText.trim() || "";
+      const previsao = Array.from(document.querySelectorAll("#agua-previsao-container li span")).map(el => el.textContent);
       const total = document.getElementById("agua-soma-container")?.textContent.trim() || "";
-      if (list.length > 0 || previsao) {
+      if (list.length > 0 || previsao.length > 0) {
         data.agua = {
           list, previsao, total,
           inputs: {
@@ -130,9 +130,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // ---------- Condomínio ----------
     (() => {
       const list = Array.from(document.querySelectorAll("#cond-list li span")).map(el => el.textContent);
-      const previsao = document.getElementById("cond-previsao-container")?.innerText.trim() || "";
+      const previsao = Array.from(document.querySelectorAll("#cond-previsao-container li span")).map(el => el.textContent);
       const total = document.getElementById("cond-soma-container")?.textContent.trim() || "";
-      if (list.length > 0 || previsao) {
+      if (list.length > 0 || previsao.length > 0) {
         data.condominio = {
           list, previsao, total,
           inputs: {

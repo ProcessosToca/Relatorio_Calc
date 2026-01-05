@@ -61,10 +61,15 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        // 2) previsões (podem ter várias linhas <p> com vários valores)
+        // 2) previsões (agora também é uma lista <ul> com <li>)
         if (previsaoEl) {
-            // use innerText para pegar o texto “visível” (já com quebras de linha)
-            soma += sumAllBRL(previsaoEl.innerText || "");
+            previsaoEl.querySelectorAll("li span").forEach(span => {
+                const re = /R\$\s*([\d\.,]+)/g;
+                for (const m of span.textContent.matchAll(re)) {
+                    const num = parseFloat(m[1].replace(/\./g, "").replace(",", "."));
+                    if (!isNaN(num)) soma += num;
+                }
+            });
         }
 
         // UI
@@ -192,7 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const iptuDivider = exists("iptu-divider");
 
         if (iptuPrev) {
-            let previsaoText = data.iptu.previsao || "";
+            let previsaoText = data.iptu.previsao || [];
             if (Array.isArray(data.iptu.previsao)) {
                 previsaoText = data.iptu.previsao;
             } else if (typeof data.iptu.previsao === "string") {
@@ -202,7 +207,24 @@ document.addEventListener("DOMContentLoaded", () => {
                     .filter(Boolean);
             }
 
-            iptuPrev.innerHTML = previsaoText.map(l => `- ${l}<br>`).join("");
+            // Reconstruir lista de previsão igual ao rebuildList
+            iptuPrev.innerHTML = "";
+            (previsaoText || []).forEach(text => {
+                const li = document.createElement("li");
+                li.className = "list-group-item d-flex justify-content-between align-items-center";
+                const span = document.createElement("span");
+                span.textContent = text;
+                const del = document.createElement("button");
+                del.className = "btn btn-sm btn-outline-danger ms-3";
+                del.textContent = "❌";
+                del.addEventListener("click", () => {
+                    li.remove();
+                    recalcSectionTotal("iptu");
+                });
+                li.appendChild(span);
+                li.appendChild(del);
+                iptuPrev.appendChild(li);
+            });
             iptuDivider.style.display = previsaoText.length ? "block" : "none";
         }
 
@@ -224,7 +246,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const energiaDivider = exists("energia-divider");
 
         if (energiaPrev) {
-            let previsaoText = data.energia.previsao || "";
+            let previsaoText = data.energia.previsao || [];
             if (Array.isArray(data.energia.previsao)) {
                 previsaoText = data.energia.previsao;
             } else if (typeof data.energia.previsao === "string") {
@@ -234,7 +256,24 @@ document.addEventListener("DOMContentLoaded", () => {
                     .filter(Boolean);
             }
 
-            energiaPrev.innerHTML = previsaoText.map(l => `- ${l}<br>`).join("");
+            // Reconstruir lista de previsão igual ao rebuildList
+            energiaPrev.innerHTML = "";
+            (previsaoText || []).forEach(text => {
+                const li = document.createElement("li");
+                li.className = "list-group-item d-flex justify-content-between align-items-center";
+                const span = document.createElement("span");
+                span.textContent = text;
+                const del = document.createElement("button");
+                del.className = "btn btn-sm btn-outline-danger ms-3";
+                del.textContent = "❌";
+                del.addEventListener("click", () => {
+                    li.remove();
+                    recalcSectionTotal("energia");
+                });
+                li.appendChild(span);
+                li.appendChild(del);
+                energiaPrev.appendChild(li);
+            });
             energiaDivider.style.display = previsaoText.length ? "block" : "none";
         }
         recalcSectionTotal("energia");
@@ -255,7 +294,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const aguaDivider = exists("agua-divider");
 
         if (aguaPrev) {
-            let previsaoText = data.agua.previsao || "";
+            let previsaoText = data.agua.previsao || [];
             if (Array.isArray(data.agua.previsao)) {
                 previsaoText = data.agua.previsao;
             } else if (typeof data.agua.previsao === "string") {
@@ -265,7 +304,24 @@ document.addEventListener("DOMContentLoaded", () => {
                     .filter(Boolean);
             }
 
-            aguaPrev.innerHTML = previsaoText.map(l => `- ${l}<br>`).join("");
+            // Reconstruir lista de previsão igual ao rebuildList
+            aguaPrev.innerHTML = "";
+            (previsaoText || []).forEach(text => {
+                const li = document.createElement("li");
+                li.className = "list-group-item d-flex justify-content-between align-items-center";
+                const span = document.createElement("span");
+                span.textContent = text;
+                const del = document.createElement("button");
+                del.className = "btn btn-sm btn-outline-danger ms-3";
+                del.textContent = "❌";
+                del.addEventListener("click", () => {
+                    li.remove();
+                    recalcSectionTotal("agua");
+                });
+                li.appendChild(span);
+                li.appendChild(del);
+                aguaPrev.appendChild(li);
+            });
             aguaDivider.style.display = previsaoText.length ? "block" : "none";
         }
 
@@ -287,7 +343,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const condDivider = exists("cond-divider");
 
         if (condPrev) {
-            let previsaoText = data.condominio.previsao || "";
+            let previsaoText = data.condominio.previsao || [];
             if (Array.isArray(data.condominio.previsao)) {
                 previsaoText = data.condominio.previsao;
             } else if (typeof data.condominio.previsao === "string") {
@@ -297,7 +353,24 @@ document.addEventListener("DOMContentLoaded", () => {
                     .filter(Boolean);
             }
 
-            condPrev.innerHTML = previsaoText.map(l => `- ${l}<br>`).join("");
+            // Reconstruir lista de previsão igual ao rebuildList
+            condPrev.innerHTML = "";
+            (previsaoText || []).forEach(text => {
+                const li = document.createElement("li");
+                li.className = "list-group-item d-flex justify-content-between align-items-center";
+                const span = document.createElement("span");
+                span.textContent = text;
+                const del = document.createElement("button");
+                del.className = "btn btn-sm btn-outline-danger ms-3";
+                del.textContent = "❌";
+                del.addEventListener("click", () => {
+                    li.remove();
+                    recalcSectionTotal("cond");
+                });
+                li.appendChild(span);
+                li.appendChild(del);
+                condPrev.appendChild(li);
+            });
             condDivider.style.display = previsaoText.length ? "block" : "none";
         }
 

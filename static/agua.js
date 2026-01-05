@@ -133,10 +133,25 @@ function setupAddResultAgua() {
 
     if (div) div.style.display = "block";
 
-    box.insertAdjacentHTML(
-      "beforeend",
-      `<p class="text-muted mb-1">- ${text}<br></p>`
-    );
+    // Criar elemento <li> igual ao agua-list
+    const li = document.createElement("li");
+    li.className = "list-group-item d-flex justify-content-between align-items-center";
+    li.innerHTML = `
+      <span>- ${text}</span>
+      <button class="btn btn-sm btn-outline-danger ms-3">❌</button>
+    `;
+
+    // Adicionar event listener ao botão de exclusão
+    li.querySelector("button").addEventListener("click", () => {
+      li.remove();
+      calculateTotalAgua();
+      // Esconder o divider se não houver mais itens
+      if (box.children.length === 0 && div) {
+        div.style.display = "none";
+      }
+    });
+
+    box.appendChild(li);
 
     calculateTotalAgua();
     clearAguaInputs(); // limpa os campos após adicionar
@@ -160,10 +175,12 @@ function calculateTotalAgua() {
     });
   }
 
-  // 2️⃣ Somar previsões (várias linhas)
+  // 2️⃣ Somar previsões (agora também é uma lista <ul> com <li>)
   if (box) {
-    const matches = box.innerText.matchAll(/R\$\s*([\d.,]+)/g);
-    for (const m of matches) soma += parseFloat(m[1].replace(/\./g, "").replace(",", "."));
+    box.querySelectorAll("li span").forEach(span => {
+      const matches = span.textContent.matchAll(/R\$\s*([\d.,]+)/g);
+      for (const m of matches) soma += parseFloat(m[1].replace(/\./g, "").replace(",", "."));
+    });
   }
 
   // 3️⃣ Atualizar UI
