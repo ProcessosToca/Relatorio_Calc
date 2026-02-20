@@ -14,8 +14,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const formatCurrencyBRL = (n) =>
     Number(n).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-  const parseNumberBR = (raw) =>
-    Number(String(raw ?? "").replace(/\./g, "").replace(",", "."));
+  // Aceita tanto "127,25" (BR) quanto "127.25" (US); evita 127.25 virar 12725
+  const parseNumberBR = (raw) => {
+    const s = String(raw ?? "").trim();
+    if (!s) return NaN;
+    const lastComma = s.lastIndexOf(",");
+    const lastDot = s.lastIndexOf(".");
+    if (lastComma > lastDot) {
+      return Number(s.replace(/\./g, "").replace(",", "."));
+    }
+    if (lastDot >= 0) {
+      return Number(s.replace(/,/g, ""));
+    }
+    if (lastComma >= 0) {
+      return Number(s.replace(",", "."));
+    }
+    return Number(s);
+  };
 
   const formatDateBRFromISO = (iso) => {
     if (!iso) return "";
